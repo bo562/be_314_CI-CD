@@ -1,0 +1,96 @@
+openapi: 3.0.0
+info:
+  title: HomeServices API
+  description: A cross reference for front-to-back end development
+  version: 1.0.0
+servers:
+  - url: https://homeservices.com/api/v1
+paths:
+  /user:
+    post: 
+      summary: Create user
+      description: Create a new user
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/User' 
+      responses:
+        default:
+          description: The operation was successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /user/login:
+    post:
+      summary: User login
+      description: User login
+      operationId: loginUser
+      parameters:
+        - name: email
+          in: query
+          description: users email address
+          required: true
+          schema:
+            type: string
+            format: email
+        - name: password
+          in: query
+          description: users password
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseAuth'
+        '400':
+          description: Invalid username or password
+            
+              
+              
+components: ## <-- this is really useful!
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 123
+        firstname: 
+          type: string
+          example: Snoop
+        lastname:
+          type: string
+          example: Dogg
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          example: myPassword123!!
+        mobile:
+          type: string
+          pattern: '^\d{10}$'
+        usertype:
+          type: string
+          enum:
+            - Client
+            - Tradesman
+    ResponseAuth:
+      type: object
+      properties:
+        token:
+          type: string
+          description: The authentication token for the user
+          
+        
+        
+    
