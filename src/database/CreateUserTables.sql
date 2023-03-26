@@ -132,3 +132,20 @@ CREATE TABLE associated_service (
 );
 CREATE UNIQUE INDEX uc_associated_service ON billing_type(professional_id, service_id);
 
+CREATE TABLE security_question (
+	 security_question_id MEDIUMINT NOT NULL AUTO_INCREMENT,
+     question           VARCHAR(2000) NOT NULL,
+     retired            DATETIME NOT NULL,
+     PRIMARY KEY (security_question_id),
+);
+CREATE UNIQUE INDEX uc_security_question_question ON security_question(question, retired);
+
+CREATE TABLE user_question (
+	 user_question_id     MEDIUMINT NOT NULL AUTO_INCREMENT,
+	 user_id              MEDIUMINT NOT NULL AUTO_INCREMENT,
+	 security_question_id MEDIUMINT NOT NULL AUTO_INCREMENT,
+     answer               VARCHAR(2000) NOT NULL,
+     PRIMARY KEY (user_question_id),
+);
+CREATE UNIQUE INDEX uc_user_question_question ON user_question(user_id, security_question_id);
+
