@@ -6,7 +6,7 @@ codeuri = "D:\\Data\\User Data\\Documents\\Documentation\\Studies\\University\\C
 runtime = "python3.9"
 architecture = "x86_64"
 handler = "app.lambda_handler"
-manifest_hash = "beae07005ad81f7112216e8277312140"
+manifest_hash = "e27d7db9200a5e7e373a0eebf849848d"
 packagetype = "Zip"
 functions = ["HelloWorldFunction"]
 
