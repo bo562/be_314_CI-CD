@@ -19,5 +19,5 @@ class User:
         self.professional = professional  # possibly null
 
 # function that takes in a json and returns a User instance
-    def CreateUserFromJson(self, json):
+    def createUserFromJson(self, json: str):
         pass

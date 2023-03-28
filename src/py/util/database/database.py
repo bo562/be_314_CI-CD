@@ -1,63 +1,98 @@
+from mysql.connector.locales.eng import client_error # for compilation, no real use in code
 from mysql.connector.errors import Error
 from mysql.connector import errorcode, MySQLConnection, connect
+from botocore.exceptions import ClientError
+from util.database.DatabaseStatus import DatabaseStatus
+import boto3
 import json
 
 
-class Database(MySQLConnection):
+class Database():
     def __init__(self, host, database, user, password):
-        super().__init__(user=user, password=password, host=host, database=database)
-        self.status = None
+        self.status: DatabaseStatus = NotImplemented
+
+        # creating mysql connection
+        self.database_connection = MySQLConnection(user=user, password=password, host=host, database='LambdaTest')
+
+        # check database connection status
+        if self.database_connection.is_connected():
+            self.status = DatabaseStatus.Connected
+        else:
+            self.status = DatabaseStatus.Disconnected
 
     def __del__(self):
-        self.Database_Disconnect()
+        self.database_disconnect()
 
     @staticmethod
-    def Database_Handler():
+    def database_handler(secret_name):
+        # retrieve secret from aws
         try:
-            # open file and parse json
-            fl = '{"server":"csit314-gp.crjrzvrrbory.us-east-1.rds.amazonaws.com","port":3306,"username":"user_lambda",' \
-                 '"database":"Project","password":"JRwp~]JfYs2gY*/"} '
-            mysql_info = json.loads(fl)
+            secret = Database.get_secret(secret_name)
+            mysql_info = json.loads(secret)
         except Exception as e:
             raise e
 
+        # attempt database connection
         try:
-            # attempt database connection
-            database = Database(mysql_info['server'], mysql_info['database'],
+            database = Database(mysql_info['host'], 'Project',
                                 mysql_info['username'], mysql_info['password'])
-
+            database.database_connect()
         except Error as err:
-            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                database.status = "ACCESS DENIED"
-            elif err.errno == errorcode.ER_BAD_DB_ERROR:
-                database.status = "DATABASE DOES NOT EXIST"
-            else:
-                database.status = err
-        else:
-            database.Database_Disconnect()
+            return err
 
         return database
 
-    def Database_Connect(self):
+    @staticmethod
+    def get_secret(secret_name):
+        region_name = "us-east-1"
+
+        # Create a Secrets Manager client
+        session = boto3.session.Session()
+        client = session.client(
+            service_name='secretsmanager',
+            region_name=region_name
+        )
+
+        try:
+            get_secret_value_response = client.get_secret_value(
+                SecretId=secret_name
+            )
+        except ClientError as e:
+            raise e
+
+        # Decrypts secret using the associated KMS key.
+        secret = get_secret_value_response['SecretString']
+
+        return secret
+
+    def database_connect(self):
+        if not self.database_connection.is_connected():
+            self.database_connection.connect()
+            self.status = DatabaseStatus.Connected
+
+    def database_disconnect(self):
+        if self.database_connection.is_connected():
+            self.database_connection.disconnect()
+            self.database_connection.close()
+        self.status = DatabaseStatus.Disconnected
+
+    def database_select(self, table):
         pass
 
-    def Database_Disconnect(self):
-        super().close()
-
-    def Database_Select(self, table):
+    def database_insert(self, row):
         pass
 
-    def Database_Insert(self, row):
+    def database_update(self):
         pass
 
-    def Database_Update(self):
+    def database_delete(self):
         pass
 
-    def Database_Delete(self):
-        pass
+    def database_query(self, query):
+        cursor = self.database_connection.cursor()
+        try:
+            cursor.execute(query)
+        except Error as err:
+            raise err
 
-    def Database_Query(self, query):
-        pass
-
-
-
+        print(cursor.fetchall())
