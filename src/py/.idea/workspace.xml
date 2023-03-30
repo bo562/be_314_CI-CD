@@ -2,9 +2,22 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a5225606-bd9d-48d2-a05d-2a6ffdebdba2" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/user/subscription.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/security/Authorisation.py" beforeDir="false" afterPath="$PROJECT_DIR$/security/Authorisation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/security/Security_Question.py" beforeDir="false" afterPath="$PROJECT_DIR$/security/Security_Question.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/security/Security_Question_Answer.py" beforeDir="false" afterPath="$PROJECT_DIR$/security/Security_Question_Answer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/security/Session.py" beforeDir="false" afterPath="$PROJECT_DIR$/security/Session.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/Offer.py" beforeDir="false" afterPath="$PROJECT_DIR$/service/Offer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/Request.py" beforeDir="false" afterPath="$PROJECT_DIR$/service/Request.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/Review.py" beforeDir="false" afterPath="$PROJECT_DIR$/service/Review.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/Service.py" beforeDir="false" afterPath="$PROJECT_DIR$/service/Service.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/Transaction.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/Transaction.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/address.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/address.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/billing.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/billing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/professional.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/professional.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/subscription.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/subscription.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/user.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
