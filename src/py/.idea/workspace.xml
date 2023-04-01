@@ -2,22 +2,34 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a5225606-bd9d-48d2-a05d-2a6ffdebdba2" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/lambda/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lambda/user_lambda.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/security/User_Question.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/service/Service_Controller.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/user/User_Controller.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../doc/database/~$$CSIT314_Schema.~vsdx" beforeDir="false" afterPath="$PROJECT_DIR$/../../doc/database/~$$CSIT314_Schema.~vsdx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../doc/py/service/service.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/../../doc/py/service/service.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../doc/py/service/service.vsdx" beforeDir="false" afterPath="$PROJECT_DIR$/../../doc/py/service/service.vsdx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../doc/py/user/user.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/../../doc/py/user/user.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../doc/py/user/user.vsdx" beforeDir="false" afterPath="$PROJECT_DIR$/../../doc/py/user/user.vsdx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/security/Authorisation.py" beforeDir="false" afterPath="$PROJECT_DIR$/security/Authorisation.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/security/Security_Question.py" beforeDir="false" afterPath="$PROJECT_DIR$/security/Security_Question.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/security/Security_Question_Answer.py" beforeDir="false" afterPath="$PROJECT_DIR$/security/Security_Question_Answer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/security/Security_Question_Answer.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/security/Session.py" beforeDir="false" afterPath="$PROJECT_DIR$/security/Session.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/Offer.py" beforeDir="false" afterPath="$PROJECT_DIR$/service/Offer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/Request.py" beforeDir="false" afterPath="$PROJECT_DIR$/service/Request.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/Review.py" beforeDir="false" afterPath="$PROJECT_DIR$/service/Review.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/Service.py" beforeDir="false" afterPath="$PROJECT_DIR$/service/Service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/Transaction.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/Transaction.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/address.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/address.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/billing.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/billing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/professional.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/professional.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/subscription.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/subscription.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/test_user.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/test_user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/Transaction.py" beforeDir="false" afterPath="$PROJECT_DIR$/service/Transaction.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/address.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/Address.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/billing.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/Billing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/client.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/Client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/professional.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/Professional.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/subscription.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/Subscription.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/User.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/user_controller.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,8 +63,8 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\Data\User Data\Documents\Documentation\Studies\University\CSIT314\Group Project\Repos\be_314\src\py\user" />
       <recent name="D:\Data\User Data\Documents\Documentation\Studies\University\CSIT314\Group Project\Repos\be_314\src\py\service" />
+      <recent name="D:\Data\User Data\Documents\Documentation\Studies\University\CSIT314\Group Project\Repos\be_314\src\py\user" />
     </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
