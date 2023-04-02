@@ -74,18 +74,6 @@ class Database:
             self.__database_connection.disconnect()
         self.status = DatabaseStatus.Disconnected
 
-    def database_select(self, table):
-        pass
-
-    def database_insert(self, row):
-        pass
-
-    def database_update(self):
-        pass
-
-    def database_delete(self):
-        pass
-
     def database_query(self, query, args: tuple = None):
         cursor = self.__database_connection.cursor()
         try:
