@@ -1,31 +1,23 @@
 """
 Class file for user data type
 """
-from dataclasses import dataclass
-from user import Professional as P, Client as C, Address as A, Billing as B
 
+from user import professional as p
+from user import client as c
 
-@dataclass
 class User:
-    user_id: int
-    firstname: str = None
-    lastname: str = None
-    email_address: str = None  # doubles as username
-    mobile: str = None
-    address: A.Address = None
-    password: str = None  # will be hashed
-    client: C.Client = None  # possibly null
-    professional: P.Professional = None  # possibly null
-    Billing: [B.Billing] = None
+    def __init__(self, user_id, firstname, lastname, email_address, mobile,
+                 address_id, password, client: c.Client, professional: p.Professional):
+        self.user_id = user_id
+        self.firstname = firstname
+        self.lastname = lastname
+        self.email_address = email_address  # doubles as username
+        self.mobile = mobile
+        self.address_id = address_id
+        self.password = password  # will be hashed
+        self.client = client  # possibly null
+        self.professional = professional  # possibly null
 
-    # SQL query to create user in User table
-    def create_user(self, first_name: str, last_name: str, email_address: str, mobile: str, password: str):
-        pass
-
-    # SQL query to update a field in User Table
-    def update_detail(self, attribute: str, value):
-        pass
-
-    # return user object (possibly in json form)
-    def get_user(self):
+# function that takes in a json and returns a User instance
+    def createUserFromJson(self, json: str):
         pass
