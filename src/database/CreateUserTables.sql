@@ -29,6 +29,7 @@ CREATE TABLE client (
      user_id            MEDIUMINT NOT NULL,
      subscription_id    MEDIUMINT
      PRIMARY KEY (client_id),
+     FOREIGN KEY (user_id) REFERENCES user(user_id),
      FOREIGN KEY (subscription_id, user_id) REFERENCES subscription(subscription_id, user_id)
 );
 CREATE UNIQUE INDEX ak_client_user_id ON client(user_id);
@@ -39,6 +40,7 @@ CREATE TABLE professional (
      user_id            MEDIUMINT NOT NULL,
      subscription_id    MEDIUMINT
      PRIMARY KEY (professional_id),
+     FOREIGN KEY (user_id) REFERENCES user(user_id),
      FOREIGN KEY (subscription_id, user_id) REFERENCES subscription(subscription_id, user_id)
 );
 CREATE UNIQUE INDEX ak_client_user_id ON client(user_id);
@@ -55,7 +57,7 @@ CREATE TABLE address (
      postcode           INT NOT NULL,
      state              CHAR(10) NOT NULL,
      PRIMARY KEY (address_id),
-     FOREIGN KEY (user_id) REFERENCES user(user_id),
+     FOREIGN KEY (user_id) REFERENCES user(user_id)
 );
 CREATE UNIQUE INDEX ak_address_user_id ON address(user_id);
 
@@ -97,16 +99,18 @@ CREATE TABLE security_question (
 	 security_question_id MEDIUMINT NOT NULL AUTO_INCREMENT,
      question           VARCHAR(2000) NOT NULL,
      retired            DATETIME NOT NULL,
-     PRIMARY KEY (security_question_id),
+     PRIMARY KEY (security_question_id)
 );
 CREATE UNIQUE INDEX uc_security_question_question ON security_question(question, retired);
 
 CREATE TABLE user_question (
 	 user_question_id     MEDIUMINT NOT NULL AUTO_INCREMENT,
-	 user_id              MEDIUMINT NOT NULL AUTO_INCREMENT,
-	 security_question_id MEDIUMINT NOT NULL AUTO_INCREMENT,
+	 user_id              MEDIUMINT NOT NULL,
+	 security_question_id MEDIUMINT NOT NULL,
      answer               VARCHAR(2000) NOT NULL,
      PRIMARY KEY (user_question_id),
+     FOREIGN KEY (security_question_id) REFERENCES security_question(security_question_id),
+     FOREIGN KEY (user_id) REFERENCES user(user_id)
 );
 CREATE UNIQUE INDEX uc_user_question_question ON user_question(user_id, security_question_id);
 
