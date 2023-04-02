@@ -5,5 +5,5 @@ This is what the user lambda will use to run the majority of code
 """
 
 
-def user_controller():
+def user_handler(event, context):
     pass
