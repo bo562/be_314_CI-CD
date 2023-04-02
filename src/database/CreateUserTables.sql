@@ -93,45 +93,6 @@ CREATE TABLE billing (
 );
 CREATE UNIQUE INDEX uc_billing_user_id ON billing_type(user_id, billing_type_id, retired);
 
-CREATE TABLE authorisation (
-	 authorisation_id   MEDIUMINT NOT NULL AUTO_INCREMENT,
-     user_id            MEDIUMINT NOT NULL,
-     refresh_token      VARCHAR(255) NOT NULL,
-     number_of_uses     INT NOT NULL,   
-     invalidated        ENUM('Y','N') NOT NULL,
-     PRIMARY KEY (authorisation_id),
-     FOREIGN KEY (user_id) REFERENCES user(user_id)
-);
-
-CREATE TABLE session (
-	 session_id         MEDIUMINT NOT NULL AUTO_INCREMENT,
-     authorisation_id   MEDIUMINT NOT NULL,
-     expiry_date        DATETIME NOT NULL,
-     access_token       VARCHAR(255) NOT NULL,
-     PRIMARY KEY (session_id),
-     FOREIGN KEY (authorisation_id) REFERENCES authorisation(authorisation_id)
-);
-
-CREATE TABLE service (
-	 service_id         MEDIUMINT NOT NULL AUTO_INCREMENT,
-     service_name       VARCHAR(255) NOT NULL,
-     cost               DECIMAL(10,2) NOT NULL,
-     retired            DATETIME NOT NULL,
-     PRIMARY KEY (service_id)
-);
-CREATE UNIQUE INDEX uc_service_name ON billing_type(service_name, retired);
- 
--- ToDo: rename table to provided_service
-CREATE TABLE associated_service (
-	 provided_service_id MEDIUMINT NOT NULL AUTO_INCREMENT,
-     service_id          MEDIUMINT NOT NULL,
-     professional_id     MEDIUMINT NOT NULL,
-     PRIMARY KEY (provided_service_id),
-     FOREIGN KEY (service_id) REFERENCES service(service_id),
-     FOREIGN KEY (professional_id) REFERENCES professional(professional_id)
-);
-CREATE UNIQUE INDEX uc_associated_service ON billing_type(professional_id, service_id);
-
 CREATE TABLE security_question (
 	 security_question_id MEDIUMINT NOT NULL AUTO_INCREMENT,
      question           VARCHAR(2000) NOT NULL,
