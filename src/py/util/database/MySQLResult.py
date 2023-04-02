@@ -1,2 +1,0 @@
-class MySQLResult:
-    pass
