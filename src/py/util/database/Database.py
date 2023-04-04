@@ -12,10 +12,10 @@ class Database:
         self.status: DatabaseStatus = NotImplemented
 
         # creating mysql connection
-        self.__database_connection = MySQLConnection(user=user, password=password, host=host, database=database)
+        self.database_connection = MySQLConnection(user=user, password=password, host=host, database=database)
 
         # check database connection status
-        if self.__database_connection.is_connected():
+        if self.database_connection.is_connected():
             self.status = DatabaseStatus.Connected
         else:
             self.status = DatabaseStatus.Disconnected
@@ -64,18 +64,18 @@ class Database:
         return secret
 
     def database_connect(self):
-        if not self.__database_connection.is_connected():
-            self.__database_connection.connect()
+        if not self.database_connection.is_connected():
+            self.database_connection.connect()
             self.status = DatabaseStatus.Connected
 
     def database_disconnect(self):
-        if self.__database_connection.is_connected():
-            self.__database_connection.close()
-            self.__database_connection.disconnect()
+        if self.database_connection.is_connected():
+            self.database_connection.close()
+            self.database_connection.disconnect()
         self.status = DatabaseStatus.Disconnected
 
     def database_query(self, query, args: tuple = None):
-        cursor = self.__database_connection.cursor()
+        cursor = self.database_connection.cursor()
         try:
             # attempt to run query and return results
             cursor.execute(query, args)
@@ -84,3 +84,40 @@ class Database:
             raise err
 
         return result
+
+    def database_insert(self, rows: tuple, args: tuple, table: str):
+        cursor = self.database_connection.cursor()
+
+        # some error checking on values
+        if len(rows) != len(args):  # need to create custom errors
+            raise Exception("Non Matching Values")
+        elif table is None:
+            raise Exception("None Table")
+
+        # set up query for arguments
+        data = ""
+        for i in range(len(args)):
+            if i + 1 < len(args):
+                data += "%s,"
+            else:
+                data += "%s"
+
+        # create column data
+        columns = ', '.join(rows)
+
+        # create insertion query
+        query = "INSERT INTO {} ({}) VALUES({})".format(table, columns, data)
+
+        try:
+            # attempt to run query and return results
+            cursor.execute(query, args)
+            self.database_connection.commit()
+        except Error as err:
+            raise err
+
+        # since insertion return last row
+        return cursor.lastrowid
+
+    def database_update(self, columns: tuple, args: tuple, table: str):
+        pass
+
