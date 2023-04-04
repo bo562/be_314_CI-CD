@@ -3,7 +3,7 @@ py that describes the controller for the user sub-package. Enabling User creatio
 authentication/authorisation
 """
 from types import SimpleNamespace
-from util.database import database
+from util.database import Database
 import json
 from user import User as U
 
@@ -12,7 +12,7 @@ class User_Controller:
     def __init__(self, data: str):
         self.data = data
 
-    def create_user(self, data) -> U.User:
+    def create_user(self, data: str) -> U.User:
         pass
 
     def update_user(self, data) -> U.User:
