@@ -27,7 +27,7 @@ CREATE UNIQUE INDEX idx_subscription_user_start ON subscription(user_id, start_d
 CREATE TABLE client (
      client_id          MEDIUMINT NOT NULL AUTO_INCREMENT,
      user_id            MEDIUMINT NOT NULL,
-     subscription_id    MEDIUMINT
+     subscription_id    MEDIUMINT,
      PRIMARY KEY (client_id),
      FOREIGN KEY (user_id) REFERENCES user(user_id),
      FOREIGN KEY (subscription_id, user_id) REFERENCES subscription(subscription_id, user_id)
@@ -38,12 +38,12 @@ CREATE UNIQUE INDEX ak_client_user_id ON client(user_id);
 CREATE TABLE professional (
      professional_id    MEDIUMINT NOT NULL AUTO_INCREMENT,
      user_id            MEDIUMINT NOT NULL,
-     subscription_id    MEDIUMINT
+     subscription_id    MEDIUMINT,
      PRIMARY KEY (professional_id),
      FOREIGN KEY (user_id) REFERENCES user(user_id),
      FOREIGN KEY (subscription_id, user_id) REFERENCES subscription(subscription_id, user_id)
 );
-CREATE UNIQUE INDEX ak_client_user_id ON client(user_id);
+CREATE UNIQUE INDEX ak_professional_user_id ON client(user_id);
 
 -- Note: PK id is redundant as AK/FK is unique user_id
 -- TODO: remove PK from this table as each user can only have 
@@ -66,7 +66,7 @@ CREATE TABLE billing_type (
 	 billing_type_id    INT NOT NULL,
      billint_type_name  CHAR(100) NOT NULL,
      retired            DATE,
-     PRIMARY KEY (billing_type_id),
+     PRIMARY KEY (billing_type_id)
 );
 CREATE INDEX idx_billing_type_name ON billing_type(billint_type_name);
 CREATE UNIQUE INDEX uc_address_user_id ON billing_type(billint_type_name, retired);
@@ -93,7 +93,7 @@ CREATE TABLE billing (
      PRIMARY KEY (billing_id),
      FOREIGN KEY (user_id) REFERENCES user(user_id)
 );
-CREATE UNIQUE INDEX uc_billing_user_id ON billing_type(user_id, billing_type_id, retired);
+CREATE UNIQUE INDEX uc_billing_user_id ON billing(user_id, billing_type_id, retired);
 
 CREATE TABLE security_question (
 	 security_question_id MEDIUMINT NOT NULL AUTO_INCREMENT,
@@ -101,7 +101,6 @@ CREATE TABLE security_question (
      retired            DATETIME NOT NULL,
      PRIMARY KEY (security_question_id)
 );
-CREATE UNIQUE INDEX uc_security_question_question ON security_question(question, retired);
 
 CREATE TABLE user_question (
 	 user_question_id     MEDIUMINT NOT NULL AUTO_INCREMENT,
