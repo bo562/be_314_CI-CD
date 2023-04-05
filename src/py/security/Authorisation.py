@@ -62,7 +62,6 @@ class Authorisation:
         except Error as err:  # simple error handling
             raise err
 
-
     def update_authorisation(self):
         pass
 
