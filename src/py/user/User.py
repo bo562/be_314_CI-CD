@@ -9,9 +9,9 @@ import json
 
 @dataclass
 class User:
-    user_id: int
-    firstname: str = None
-    lastname: str = None
+    user_id: int = None
+    first_name: str = None
+    last_name: str = None
     email_address: str = None  # doubles as username
     mobile: str = None
     password: str = None  # will be hashed
