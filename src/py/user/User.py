@@ -7,9 +7,9 @@ from user import Professional as P, Client as C, Address as A, Billing as B
 
 @dataclass
 class User:
-    user_id: int
-    firstname: str = None
-    lastname: str = None
+    user_id: int = None
+    first_name: str = None
+    last_name: str = None
     email_address: str = None  # doubles as username
     mobile: str = None
     address: A.Address = None
