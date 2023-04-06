@@ -12,3 +12,17 @@ class Address:
     suburb: str = None
     postcode: int = None
     state: str = None
+
+    @staticmethod
+    def default(obj):
+        if isinstance(obj, Address):
+            remap = {
+                "streetname": obj.street_name,
+                "streetnumber": obj.street_number,
+                "suburb": obj.suburb,
+                "postcode": obj.postcode
+            }
+
+            return remap
+
+        raise TypeError
