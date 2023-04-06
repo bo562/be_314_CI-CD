@@ -1,64 +1,147 @@
 import unittest
-from util.database import Database as db, DatabaseStatus as ds
+from mysql.connector import errors
+from util.database.Database import Database
+from util.database.DatabaseStatus import DatabaseStatus
 from util.database.DatabaseLookups import DatabaseLookups
+from user.User import User
 
 secret_name = '314-db-lambda-user'
 
 
 class TestDatabase(unittest.TestCase):
-    def ttest_database_connection(self):
-        database = db.Database.database_handler(DatabaseLookups.User.value)  # create database to connect to
-        database.database_connect()  # connect to database
-        self.assertEqual(database.status, ds.DatabaseStatus.Connected)
+    def test_simple_select(self):
+        database = Database.database_handler(DatabaseLookups.User)
+        database.clear()
 
-    def ttest_database_query(self):
-        database = db.Database.database_handler(DatabaseLookups.User.value)  # create database to connect to
-        database.database_connect()  # connect to database
+        # select from specific table
+        database.select(('user.user_id', 'first_name', 'last_name'), 'user')
 
-        # check if connected to database
-        if database.status is not ds.DatabaseStatus.Connected:
-            raise Exception()
+        # review query
+        print(database.review_query())
 
-        # run query to database
-        query = "SELECT * FROM User WHERE user_id = %s"
-        user_id = "1"
-        result = database.database_query(query, tuple(user_id))
-
-    def ttest_database_query1(self):
-        database = db.Database.database_handler(DatabaseLookups.User.value)  # create database to connect to
-        database.database_connect()  # connect to database
-
-        # check if connected to database
-        if database.status is not ds.DatabaseStatus.Connected:
-            raise Exception()
-
-        # run query to database
-        query = "SELECT * FROM User"
-        result = database.database_query(query)
-
-    def ttest_database_insert(self):
-        database = db.Database.database_handler(DatabaseLookups.User.value)  # create database to connect to
-        database.database_connect()  # connect to database
-
-        # check if connected to database
-        if database.status is not ds.DatabaseStatus.Connected:
-            raise Exception()
-
-        # run query to database
-        results = database.database_insert(('first_name', 'last_name', 'email_address', 'mobile', 'password'),
-                                 ('Jorge', 'Havel', 'jhavel@gmail.com', '4545454545', 'asdasdasdfff'), 'user')
+        # get results from query
+        results = database.run()
 
         print(results)
 
-    def test_database_update(self):
-        database = db.Database.database_handler(DatabaseLookups.User.value)  # create database to connect to
-        database.database_connect()  # connect to database
+    def test_where_select(self):
+        database = Database.database_handler(DatabaseLookups.User)
+        database.clear()
 
-        # check if connected to database
-        if database.status is not ds.DatabaseStatus.Connected:
-            raise Exception()
+        # select from specific table
+        database.select(('user.user_id',), 'user')
+        database.where("user_id = %s ", "1",)
 
-        database.database_connection.cursor()
+        # review query
+        print(database.review_query())
+
+        # get results from query
+        results = database.run()
+
+        print(results)
+
+    def test_inner_select(self):
+        database = Database.database_handler(DatabaseLookups.User)
+        database.clear()
+
+        # select from specific table
+        database.select('user.user_id, client.client_id', 'user')
+        database.inner_join('client', 'user.user_id', 'client.user_id')
+
+        # review query
+        print(database.review_query())
+
+        # get results from query
+        results = database.run()
+
+        print(results)
+
+    def test_insert(self):
+        database = Database.database_handler(DatabaseLookups.User)
+        database.clear()
+
+        # create test object
+        usr = User(first_name='Jason', last_name='Bourne', email_address='jbourne@outlook.com',
+                   mobile='88888888', password='password')
+
+        # select from specific table
+        database.insert(usr, 'user')
+
+        # review query
+        print(database.review_query())
+
+        # get results from query
+        results = None
+        try:
+            results = database.run()
+        except errors.IntegrityError as ie:
+            print("Functioning Correctly")
+        except Exception as e:
+            raise e
+
+        print(results)
+
+    def test_update(self):
+        database = Database.database_handler(DatabaseLookups.User)
+        database.clear()
+
+        # create test object
+        usr = User(user_id=8, mobile='99999999', password='password1')
+
+        # select from specific table
+        database.update(usr, 'user')
+        database.where('user_id = %s', usr.user_id)
+
+        # review query
+        print(database.review_query())
+
+        # get results from query
+        results = None
+        try:
+            results = database.run()
+        except errors.IntegrityError as ie:
+            print("Functioning Correctly")
+        except Exception as e:
+            raise e
+
+        print(results)
+
+    def test_delete(self):
+        database = Database.database_handler(DatabaseLookups.User)
+        database.clear()
+
+        # create test object
+        usr = User(user_id=8)
+
+        # select from specific table
+        database.delete('user')
+        database.where('user_id = %s', usr.user_id)
+
+        # review query
+        print(database.review_query())
+
+        # get results from query
+        results = None
+        try:
+            results = database.run()
+        except errors.IntegrityError as ie:
+            print("Functioning Correctly")
+        except Exception as e:
+            raise e
+
+        print(results)
+
+    def test_query(self):
+        # set up database connection and query
+        database = Database.database_handler(DatabaseLookups.User)
+        database.clear()
+
+        query = "SELECT user.user_id, client.client_id FROM user " \
+                "INNER JOIN client ON user.user_id = client.user_id " \
+                "WHERE user.user_id = %s"
+        args = ('1',)
+
+        results = database.query(query, args)
 
         print(results)
 
