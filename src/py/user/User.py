@@ -2,8 +2,14 @@
 Class file for user data type
 """
 from dataclasses import dataclass
-from user import Professional as P, Client as C, Address as A, Billing as B, User_Security_Question as Q
-from util.database import Database as db, DatabaseLookups as dl
+from user.Professional import Professional
+from user.Client import Client
+from user.Address import Address
+from user.Billing import Billing
+from user.User_Question import User_Question
+from util.database.Database import Database
+from util.database.DatabaseLookups import DatabaseLookups
+from util.database.DatabaseStatus import DatabaseStatus
 import json
 
 
@@ -15,37 +21,26 @@ class User:
     email_address: str = None  # doubles as username
     mobile: str = None
     password: str = None  # will be hashed
-    address: A.Address = None
-    client: C.Client = None  # possibly null
-    professional: P.Professional = None  # possibly null
-    cc_out: B.Billing = None
-    cc_in: B.Billing = None
-    security_questions: [Q.User_Security_Question] = None
+    address: Address = None
+    client: Client = None  # possibly null
+    professional: Professional = None  # possibly null
+    cc_out: Billing = None
+    cc_in: Billing = None
+    Security_Questions: [User_Question] = None
 
     # SQL query to create user in User table
-    def create_user(self):
-        try:
-            database = db.Database.database_handler(dl.DatabaseLookups.User.value)  # create database to connect to
-            database.database_connect()  # connect to database
-            query = "SELECT user_id FROM project.user WHERE email_address=%s"
-            query_data = (self.email_address)
-            validationcheck = database.database_query(query, query_data)
-            if isinstance(validationcheck, int):
-                return "User Already Exists"
-        except Exception as e:
-            print("Database Connection Error")
-        query = ("INSERT INTO project.user "
-                 "(firstname, lastname, email_address, mobile, password) "
-                 "VALUES (%s, %s, %s, %s, %s)")
-        query_data = (self.firstname, self.lastname, self.email_address, self.mobile, self.password)
-        database.database_query(query, query_data)
-        query = "SELECT user_id FROM project.user WHERE email_address=%s"
-        query_data = self.email_address
-        tuser_id = database.database_query(query, query_data)
-        if not isinstance(tuser_id, int) or tuser_id < 0:
-            return "User Creation Failed"
-        self.user_id = tuser_id
-        database.database_disconnect()
+    def create_user(self) -> 'User':
+        database = Database.database_handler(DatabaseLookups.User)  # create database instance
+
+        # check if database is connected, if not connect
+        if database.status is DatabaseStatus.Disconnected:
+            database.connect()
+
+        # check if user already exists
+        database.select(('user_id',), 'user')
+        database.where('email_address=%s', self.email_address)
+
+
 
     def update_user(self):
         try:
