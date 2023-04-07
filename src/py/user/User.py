@@ -1,9 +1,9 @@
 """
 Class file for user data type
 """
-import json
 from dataclasses import dataclass
 
+from user.User_Question import User_Question
 from user.Address import Address
 from user.Client import Client
 from user.Professional import Professional
@@ -21,7 +21,8 @@ class User:
     password: str = None  # will be hashed
     client: Client = None  # possibly null
     professional: Professional = None  # possibly null
-    Billing: [] = None
+    Billing: Billing = None
+    Security_Questions: [User_Question] = None
 
     # SQL query to create user in User table
     def create_user(self, first_name: str, last_name: str, email_address: str, mobile: str, password: str):
@@ -34,20 +35,6 @@ class User:
     # return user object (possibly in json form)
     def get_user(self, obj):
         pass
-
-    def get_in_billing(self, ):
-        for bill in self.Billing:
-            if bill.billing_type == 'In':
-                return bill
-
-        return None
-
-    def get_out_billing(self, ):
-        for bill in self.Billing:
-            if bill.billing_type == 'Out':
-                return bill
-
-        return None
 
     # customer return type for defined API
     @staticmethod
@@ -63,7 +50,7 @@ class User:
                 "address": obj.address,
                 "client": obj.client,
                 "professional": obj.professional,
-                "CCout": obj.get_out_billing()
+                "CCout": obj.Billing
             }
             return remap
 
@@ -72,7 +59,9 @@ class User:
     @staticmethod
     def FromAPI(obj):
         # create base user object
-        usr = User(user_id=obj.get('userID'), first_name=obj.get('firstname'), last_name=obj.get('lastname'),
-                   email_address=obj.get('email'), address=obj.get('address'), password=obj.get('password'))
+        usr = User(user_id=obj.get('user_id'), first_name=obj.get('firstName'), last_name=obj.get('lastName'),
+                   email_address=obj.get('email'), address=obj.get('address'), mobile=obj.get('mobile'),
+                   Billing=obj.get('CCOut'), password=obj.get('password'), client=obj.get('client'),
+                   Security_Questions=obj.get('securityQuestions'), professional=obj.get('professional'))
 
         return usr

@@ -18,3 +18,7 @@ class Client:
             return remap
 
         raise TypeError
+
+    @staticmethod
+    def FromAPI(obj):
+        return Client(client_id=-1, subscription_id=obj.get('membershipType'))

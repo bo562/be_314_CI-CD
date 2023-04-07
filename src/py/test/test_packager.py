@@ -22,32 +22,71 @@ class TestPackager(unittest.TestCase):
         professional = Professional(2, 1)
         usr = User(user_id=1, first_name='James', last_name='Bond', email_address='jbond@gmail.com',
                    mobile='04102342342', address=address, password='password', client=client, professional=professional,
-                   Billing=(billing_in, billing_out))
+                   Billing=billing_out)
 
         packager = Encoder(usr)
         #print(packager.serialize())
 
     def test_deserialize(self):
         user_input = """
-        {
-            "userID": 1,
-            "firstname": "Snoop",
-            "lastname": "Dogg",
-            "email": "myemail@email.com",
-            "password": "myPassword123!!",
-            "mobile": "3344003626",
-            "address": {
-                "streetname": "Sesame Street",
-                "streetnumber": 7,
-                "suburb": "Liverpool",
-                "postcode": "2170"
+            {
+                "user_id": 1,
+                "firstName": "James",
+                "lastName": "Bond",
+                "email": "jbond@outlook.com",
+                "mobile": "0412345678",
+                "password": "Password1",
+                "address": {
+                    "streetNumber": "8",
+                    "streetName": "Biggie Street",
+                    "suburb": "Liverpool",
+                    "postcode": "2170"
+                },
+                "CCOut": {
+                    "CCName": "Outgoing",
+                    "CCNumber": "1234 5678 9111 2134",
+                    "CVV": "123",
+                    "billingType": "Out",
+                    "expiryDate": "11/2024"
+                },
+                "client": {
+                    "membershipType": "Subscription"
+                },
+                "professional": {
+                    "CCin": {
+                        "CCName": "Incoming",
+                        "CCNumber": "4444 4444 4444 4444",
+                        "CVV": "333",
+                        "billingType": "In",
+                        "expiryDate": "11/2025"
+                    },
+                    "services": [
+                        "Oven Repairs",
+                        "Fence Installation",
+                        "Roof Cleaning"
+                    ]
+                },
+                "securityQuestions": {
+                    "securityQuestion1": {
+                        "securityQuestion": "What was your first car?",
+                        "answer": "Car"
+                    },
+                    "securityQuestion2": {
+                        "securityQuestion": "What was your childhood nickname?",
+                        "answer": "Nickname"
+                    },
+                    "securityQuestion3": {
+                        "securityQuestion": "What city were you born in?",
+                        "answer": "City"
+                    }
+                }
             }
-        }
         """
 
         decoder = Decoder(user_input, User)
         result = decoder.deserialize()
-        #print(result)
+        encoder = Encoder(result)
+        print(encoder.serialize())
 
     if __name__ == '__main__':
         unittest.main(warnings='ignore')

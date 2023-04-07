@@ -27,3 +27,8 @@ class Billing:
             return remap
 
         raise TypeError
+
+    @staticmethod
+    def FromAPI(obj):
+        return Billing(billing_id=-1, name=obj.get('CCName'), card_number=obj.get('CCNumber'),
+                       expiry_date=obj.get('expiryDate'), cvv=obj.get('CVV'), billing_type=obj.get('billingType'))

@@ -10,6 +10,7 @@ from user.Billing import Billing
 from user.Client import Client
 from user.Professional import Professional
 from user.Subscription import Subscription
+from user.User_Question import User_Question
 
 
 class Decoder:
@@ -22,17 +23,29 @@ class Decoder:
         self.__class_type = class_type
 
     def deserialize(self):
-        return json.loads(self.__object, object_hook=Decoder.default)
+        decoded = json.loads(self.__object, object_hook=Decoder.default)
+        return decoded
 
     # based on object type call correct FromAPI method
     @staticmethod
     def default(obj: object):
-        if 'address' not in obj.keys():
-            print(obj)
-            return Address.FromAPI(obj)
-        elif 'userID' in obj.keys():
-            print(obj)
+        if 'user_id' in obj.keys():  # checking for main user object
             return User.FromAPI(obj)
+
+        elif 'CCName' in obj.keys():  # checking for CCOut field
+            return Billing.FromAPI(obj)
+
+        elif 'streetName' in obj.keys():  # checking for address field
+            return Address.FromAPI(obj)
+
+        elif 'membershipType' in obj.keys():  # checking for client field
+            return Client.FromAPI(obj)
+
+        elif 'CCin' in obj.keys():  # checking for professional field
+            return Professional.FromAPI(obj)
+
+        elif 'securityQuestion1' in obj.keys():  # checking for security question field
+            return User_Question.FromAPI(obj)
+
         else:
-            print(obj)
             return obj

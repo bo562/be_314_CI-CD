@@ -29,5 +29,5 @@ class Address:
 
     @staticmethod
     def FromAPI(obj):
-        return Address(address_id=obj.get('address_id'), street_number=obj.get('streetnumber'),
-                       street_name=obj.get('streetname'), suburb=obj.get('suburb'), postcode=obj.get('postcode'))
+        return Address(address_id=-1, street_number=obj.get('streetNumber'),
+                       street_name=obj.get('streetName'), suburb=obj.get('suburb'), postcode=obj.get('postcode'))
