@@ -12,3 +12,4 @@ class Subscription:
     fee: float = None
     start_date: datetime = None
     end_date: datetime = None
+

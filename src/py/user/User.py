@@ -1,8 +1,13 @@
 """
 Class file for user data type
 """
+import json
 from dataclasses import dataclass
-from user import Professional as P, Client as C, Address as A, Billing as B
+
+from user.Address import Address
+from user.Client import Client
+from user.Professional import Professional
+from user.Billing import Billing
 
 
 @dataclass
@@ -12,10 +17,10 @@ class User:
     last_name: str = None
     email_address: str = None  # doubles as username
     mobile: str = None
-    address: A.Address = None
+    address: Address = None
     password: str = None  # will be hashed
-    client: C.Client = None  # possibly null
-    professional: P.Professional = None  # possibly null
+    client: Client = None  # possibly null
+    professional: Professional = None  # possibly null
     Billing: [] = None
 
     # SQL query to create user in User table
@@ -46,7 +51,7 @@ class User:
 
     # customer return type for defined API
     @staticmethod
-    def default(obj):
+    def ToAPI(obj):
         if isinstance(obj, User):
             remap = {
                 "userID": obj.user_id,
@@ -63,3 +68,11 @@ class User:
             return remap
 
         raise TypeError
+
+    @staticmethod
+    def FromAPI(obj):
+        # create base user object
+        usr = User(user_id=obj.get('userID'), first_name=obj.get('firstname'), last_name=obj.get('lastname'),
+                   email_address=obj.get('email'), address=obj.get('address'), password=obj.get('password'))
+
+        return usr

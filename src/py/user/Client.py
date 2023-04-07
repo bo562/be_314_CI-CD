@@ -8,3 +8,13 @@ from dataclasses import dataclass
 class Client:
     client_id: int
     subscription_id: int = None
+
+    @staticmethod
+    def ToAPI(obj):
+        if isinstance(obj, Client):
+            remap = {
+                "membershiptype": obj.subscription_id
+            }
+            return remap
+
+        raise TypeError

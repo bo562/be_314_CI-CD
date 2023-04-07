@@ -2,14 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a5225606-bd9d-48d2-a05d-2a6ffdebdba2" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/test/test_packager.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/util/packager/Packager.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/util/packager/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/packager/Decoder.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/packager/Encoder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/test_packager.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/test_packager.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/Address.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/Address.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/Billing.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/Billing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/Client.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/Client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/Professional.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/Professional.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/Subscription.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/Subscription.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/User.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/User.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/packager/Packager.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/packager/Packager.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

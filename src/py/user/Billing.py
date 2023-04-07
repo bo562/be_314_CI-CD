@@ -15,7 +15,7 @@ class Billing:
     billing_type: str = None
 
     @staticmethod
-    def default(obj):
+    def ToAPI(obj):
         if isinstance(obj, Billing):
             remap = {
                 "CCname": obj.name,

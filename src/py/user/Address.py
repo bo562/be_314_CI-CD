@@ -14,7 +14,7 @@ class Address:
     state: str = None
 
     @staticmethod
-    def default(obj):
+    def ToAPI(obj):
         if isinstance(obj, Address):
             remap = {
                 "streetname": obj.street_name,
@@ -26,3 +26,8 @@ class Address:
             return remap
 
         raise TypeError
+
+    @staticmethod
+    def FromAPI(obj):
+        return Address(address_id=obj.get('address_id'), street_number=obj.get('streetnumber'),
+                       street_name=obj.get('streetname'), suburb=obj.get('suburb'), postcode=obj.get('postcode'))
