@@ -3,18 +3,9 @@ py that describes the controller for the user sub-package. Enabling User creatio
 authentication/authorisation
 The controller should mimic the functionality of expected output of Lambda function in AWS
 """
-from types import SimpleNamespace
-from mysql.connector.errors import Error
-from util.database import Database
-from datetime import datetime
+
 import json
 from user.User import User
-from user.Address import Address
-from user.Subscription import Subscription
-from user.Client import Client
-from user.Professional import Professional
-from user.Billing import Billing
-from user.User_Question import User_Question
 
 
 class User_Controller:
@@ -29,6 +20,8 @@ class User_Controller:
     def Event_Start(event: str, context: str):
         # create controller to handle event
         user_controller = User_Controller(event=event, context=context)
+
+        return "Hello Lambda!"
 
         # begin handling event
         user_controller.handle_event()

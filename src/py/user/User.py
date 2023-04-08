@@ -36,9 +36,8 @@ class User:
         if database.status is DatabaseStatus.Disconnected:
             database.connect()
 
-        # check if user already exists
-        database.select(('user_id',), 'user')
-        database.where('email_address=%s', self.email_address)
+        # attempt to create user
+
 
 
 

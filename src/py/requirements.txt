@@ -1,3 +1,3 @@
-mysql-connector-python~=8.0.32
+mysql-connector-python-rf
 boto3
 botocore
