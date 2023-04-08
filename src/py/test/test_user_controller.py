@@ -1,36 +1,13 @@
-import orjson
-
-from user.User import User
-from user.Address import Address
-from user.Billing import Billing
-from user.Client import Client
-from user.Professional import Professional
-from user.Subscription import Subscription
-from util.packager.Encoder import Encoder
-from util.packager.Decoder import Decoder
 import unittest
 
+from user.User_Controller import User_Controller
 
-class TestPackager(unittest.TestCase):
-    def test_serialize(self):
-        address = Address(address_id=1, street_number='10', street_name='Adam Street', suburb='James Park',
-                          postcode='3434')
-        billing_in = Billing(billing_id=1, name='David James', card_number='1234 4567 8910 1112',
-                             expiry_date='10/2024', ccv='123', billing_type='In')
-        billing_out = Billing(billing_id=1, name='David James', card_number='2111 0198 1233 3323',
-                              expiry_date='10/2025', ccv='123', billing_type='Out')
-        client = Client(1, subscription_id=1)
-        professional = Professional(2, 1)
-        usr = User(user_id=1, first_name='James', last_name='Bond', email_address='jbond@gmail.com',
-                   mobile='04102342342', address=address, password='password', client=client, professional=professional,
-                   ccout=billing_out)
 
-        packager = Encoder(usr)
-        print(packager.serialize())
-
-    def test_deserialize(self):
+class MyTestCase(unittest.TestCase):
+    def test_controller(self):
         user_input = """
-            {
+        {
+            "body-json": {
                 "user_id": 1,
                 "firstName": "James",
                 "lastName": "Bond",
@@ -81,12 +58,22 @@ class TestPackager(unittest.TestCase):
                         "answer": "City"
                     }
                 }
+            },
+            "context": {
+                "authorizer-principal-id": "",
+                "caller": "",
+                "http-method": "POST",
+                "stage": "dev",
+                "request-id": "9a48d040-e44a-40c3-9b6a-f6ea2ac1a766",
+                "resource-id": "k2axvw",
+                "resource-path": "/user/userCreate"
             }
+        }
         """
 
-        decoder = Decoder(user_input, User)
-        result = decoder.deserialize()
+        result = User_Controller.Event_Start(user_input)
         print(result)
 
-    if __name__ == '__main__':
-        unittest.main(warnings='ignore')
+
+if __name__ == '__main__':
+    unittest.main()

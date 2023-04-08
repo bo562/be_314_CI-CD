@@ -37,28 +37,38 @@ class User:
             database.connect()
 
         # attempt to create base user
-        database.insert(self, 'user', ('user_id', 'client', 'ccout', 'security_questions', 'address'))  # create query
+        database.clear()
+        database.insert(self, 'user', ('user_id', 'address', 'ccout', 'client', 'professional', 'security_questions'))
 
         try:
-            user_id = database.run()
+            self.user_id = database.run()
             database.commit()
+
         except errors.IntegrityError as ie:  # in case that user already exists
+            if ie.errno == 1452:  # cannot solve gracefully
+                database.disconnect()
+                raise ie
+
             # constructing query to return already created user
             database.clear()
             database.select(('user_id', ), 'user')
             database.where('email_address = %s', self.email_address)
-            user_id = database.run()[0][0]
 
-            # set user_id
-            self.user_id = user_id  # user already exists return user
-
+            # run query and return user_id
+            self.user_id = database.run()[0]
             return self
 
-        # create billing information
+        # add nested classes
         database.clear()
-        self.user_id = user_id
         self.ccout.create_billing(self.user_id)
         self.address.create_address(self.user_id)
+
+        # conditional nesting (may not occur for all users)
+        if self.client is not None:
+            self.client.create_client(self.user_id)
+
+        if self.professional is not None:
+            self.professional.create_professional(self.user_id)
 
         # commit and close database connection
         database.disconnect()

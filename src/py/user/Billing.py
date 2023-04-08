@@ -30,16 +30,16 @@ class Billing:
 
         # attempt to create billing object
         self.user_id = user_id
-        print(self)
         database.insert(self, 'billing', ('billing_id', 'name', 'billing_type'))  # create query
-        print(database.review_query())
 
-        billing_id = -1
         try:
             billing_id = database.run()
             database.commit()
+
         except errors.IntegrityError as ie:
-            print(ie.errno)
+            if ie.errno == 1452:  # cannot solve gracefully
+                raise ie
+
             # return billing data, get billing type first
             database.clear()
             database.select(('billing_type_id',), 'billing_type')
@@ -51,8 +51,6 @@ class Billing:
             database.select(('billing_id', ), 'billing')
             database.where('card_number = %s', self.card_number)
             database.ampersand('ccv = %s', self.ccv)
-
-            print(database.review_query())
 
             billing_id = database.run()
             self.billing_id = billing_id

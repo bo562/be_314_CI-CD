@@ -6,38 +6,48 @@ The controller should mimic the functionality of expected output of Lambda funct
 
 import json
 from user.User import User
+from util.packager.Decoder import Decoder
+from util.packager.Encoder import Encoder
 
 
 class User_Controller:
     __event: str  # actual data sent from api gateway
-    __context: object
+    __context = None
 
     def __init__(self, event: str):
         self.__event = event
-        self.__context = json.loads(event['context'])
+        self.__context = event.get('context')
 
     @staticmethod
-    def Event_Start(event: str, context: str):
+    def Event_Start(event: str):
         # create controller to handle event
-        user_controller = User_Controller(event=event, context=context)
-
-        return "Hello Lambda!"
+        user_controller = User_Controller(event=event)
 
         # begin handling event
-        user_controller.handle_event()
+        return user_controller.handle_event()
 
     def handle_event(self):
-        result = None  # store result to return to requester
-
         # determine which method to call based on api request
-        if self.__context['resource-path'] == '/user/userCreate':
-            self.create_user()
+        if self.__context.get('resource-path') == '/user/userCreate':
+            return self.create_user()
 
-        elif '/user/updateUser' in self.__context['resource-path']:  # since the path will contain the user id
-            self.update_user()
+        elif '/user/updateUser' in self.__context.get('resource-path'):  # since the path will contain the user id
+            return self.update_user()
 
     def create_user(self) -> User:
-        pass
+        try:
+            json_body = self.__event.get('body-json')
+            usr = Decoder(json_body, 'User').deserialize()
+            new_user = usr.create_user()
+
+        except Exception as e:
+            raise e
+
+        try:
+            encoded = Encoder(new_user).serialize()
+
+        except Exception as e:
+            raise e
 
     def update_user(self) -> User:
         pass

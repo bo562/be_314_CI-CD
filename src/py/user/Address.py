@@ -33,11 +33,14 @@ class Address:
 
         # attempt to create address row
         database.insert(self, 'address', ('address_id',))
-        print(database.review_query())
+
         try:
             address_id = database.run()
             database.commit()
         except errors.IntegrityError as ie:  # in case that user already exists
+            if ie.errno == 1452:  # cannot solve gracefully
+                raise ie
+
             # constructing query to return already created user
             database.clear()
             database.select(('address_id', ), 'address')
