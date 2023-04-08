@@ -11,17 +11,12 @@ CREATE UNIQUE INDEX ak_user_email ON user(email_address);
 
 -- TODO: Drop subscription_name
 CREATE TABLE subscription (
-	 subscription_id    MEDIUMINT NOT NULL AUTO_INCREMENT,
-     user_id            MEDIUMINT NOT NULL,
+	subscription_id    MEDIUMINT NOT NULL AUTO_INCREMENT,
      subscription_name  CHAR(100),
      fee                DECIMAL(10,2) NOT NULL,
-     start_date         DATETIME NOT NULL,
-     end_date           DATETIME,
-     PRIMARY KEY (subscription_id),
-     FOREIGN KEY (user_id) REFERENCES user(user_id)
+     PRIMARY KEY (subscription_id)
 );
-CREATE INDEX idx_subscription_user ON subscription(subscription_id, user_id);
-CREATE UNIQUE INDEX idx_subscription_user_start ON subscription(user_id, start_date);
+CREATE UNIQUE INDEX idx_subscription_name ON subscription(subscription_name);
 
 -- Note: subscription_id points to the most recent subscription
 CREATE TABLE client (
@@ -30,7 +25,7 @@ CREATE TABLE client (
      subscription_id    MEDIUMINT,
      PRIMARY KEY (client_id),
      FOREIGN KEY (user_id) REFERENCES user(user_id),
-     FOREIGN KEY (subscription_id, user_id) REFERENCES subscription(subscription_id, user_id)
+     FOREIGN KEY (subscription_id) REFERENCES subscription(subscription_id)
 );
 CREATE UNIQUE INDEX ak_client_user_id ON client(user_id);
 
@@ -41,7 +36,7 @@ CREATE TABLE professional (
      subscription_id    MEDIUMINT,
      PRIMARY KEY (professional_id),
      FOREIGN KEY (user_id) REFERENCES user(user_id),
-     FOREIGN KEY (subscription_id, user_id) REFERENCES subscription(subscription_id, user_id)
+     FOREIGN KEY (subscription_id) REFERENCES subscription(subscription_id)
 );
 CREATE UNIQUE INDEX ak_professional_user_id ON client(user_id);
 
@@ -63,30 +58,21 @@ CREATE UNIQUE INDEX ak_address_user_id ON address(user_id);
 
 -- If retired is null then the record is active
 CREATE TABLE billing_type (
-	 billing_type_id    INT NOT NULL,
-     billint_type_name  CHAR(100) NOT NULL,
+	billing_type_id    INT NOT NULL AUTO_INCREMENT,
+     billing_type_name  CHAR(100) NOT NULL,
      retired            DATE,
      PRIMARY KEY (billing_type_id)
 );
-CREATE INDEX idx_billing_type_name ON billing_type(billint_type_name);
-CREATE UNIQUE INDEX uc_address_user_id ON billing_type(billint_type_name, retired);
-
-INSERT INTO billing_type
-	(billing_type_id, billint_type_name,retired)
-  VALUES
-    (1, 'Out', null);
-INSERT INTO billing_type
-	(billing_type_id, billint_type_name,retired)
-  VALUES
-    (2, 'In', null);
-COMMIT;
+CREATE INDEX idx_billing_type_name ON billing_type(billing_type_name);
+CREATE UNIQUE INDEX uc_address_user_id ON billing_type(billing_type_name, retired);
 
 -- If retired is null then the record is active
 CREATE TABLE billing (
-	 billing_id         MEDIUMINT NOT NULL AUTO_INCREMENT,
+	billing_id         MEDIUMINT NOT NULL AUTO_INCREMENT,
      user_id            MEDIUMINT NOT NULL,
+     name               CHAR(100) NOT NULL,
      card_number        CHAR(100) NOT NULL,
-     expiry_date        DATE NOT NULL,
+     expiry_date        CHAR(10) NOT NULL,
      ccv                INT NOT NULL,
      billing_type_id    INT NOT NULL,       
      retired            DATE,
@@ -96,16 +82,16 @@ CREATE TABLE billing (
 CREATE UNIQUE INDEX uc_billing_user_id ON billing(user_id, billing_type_id, retired);
 
 CREATE TABLE security_question (
-	 security_question_id MEDIUMINT NOT NULL AUTO_INCREMENT,
+	security_question_id MEDIUMINT NOT NULL AUTO_INCREMENT,
      question           VARCHAR(2000) NOT NULL,
      retired            DATETIME NOT NULL,
      PRIMARY KEY (security_question_id)
 );
 
 CREATE TABLE user_question (
-	 user_question_id     MEDIUMINT NOT NULL AUTO_INCREMENT,
-	 user_id              MEDIUMINT NOT NULL,
-	 security_question_id MEDIUMINT NOT NULL,
+	user_question_id     MEDIUMINT NOT NULL AUTO_INCREMENT,
+	user_id              MEDIUMINT NOT NULL,
+	security_question_id MEDIUMINT NOT NULL,
      answer               VARCHAR(2000) NOT NULL,
      PRIMARY KEY (user_question_id),
      FOREIGN KEY (security_question_id) REFERENCES security_question(security_question_id),
