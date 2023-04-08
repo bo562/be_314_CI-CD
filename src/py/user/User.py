@@ -2,7 +2,7 @@
 Class file for user data type
 """
 from dataclasses import dataclass
-
+from mysql.connector import errors
 from user.User_Question import User_Question
 from user.Address import Address
 from user.Client import Client
@@ -25,8 +25,8 @@ class User:
     password: str = None  # will be hashed
     client: Client = None  # possibly null
     professional: Professional = None  # possibly null
-    Billing: Billing = None
-    Security_Questions: [User_Question] = None
+    ccout: Billing = None
+    security_questions: [User_Question] = None
 
     # SQL query to create user in User table
     def create_user(self) -> 'User':
@@ -36,14 +36,38 @@ class User:
         if database.status is DatabaseStatus.Disconnected:
             database.connect()
 
-        # attempt to create user
+        # attempt to create base user
+        database.insert(self, 'user', ('user_id', 'client', 'ccout', 'security_questions', 'address'))  # create query
 
+        try:
+            user_id = database.run()
+            database.commit()
+        except errors.IntegrityError as ie:  # in case that user already exists
+            # constructing query to return already created user
+            database.clear()
+            database.select(('user_id', ), 'user')
+            database.where('email_address = %s', self.email_address)
+            user_id = database.run()[0][0]
 
+            # set user_id
+            self.user_id = user_id  # user already exists return user
 
+            return self
+
+        # create billing information
+        database.clear()
+        self.user_id = user_id
+        self.ccout.create_billing(self.user_id)
+        self.address.create_address(self.user_id)
+
+        # commit and close database connection
+        database.disconnect()
+
+        return self
 
     def update_user(self):
         try:
-            database = db.Database.database_handler(dl.DatabaseLookups.User.value)  # create database to connect to
+            database = Database.database_handler(DatabaseLookups.User.value)  # create database to connect to
             database.database_connect()  # connect to database
             query = "SELECT user_id FROM project.user WHERE user_id=%d"
             query_data = self.user_id
@@ -83,7 +107,7 @@ class User:
                 "address": obj.address,
                 "client": obj.client,
                 "professional": obj.professional,
-                "CCout": obj.Billing
+                "CCout": obj.ccout
             }
             return remap
 
@@ -94,7 +118,7 @@ class User:
         # create base user object
         usr = User(user_id=obj.get('user_id'), first_name=obj.get('firstName'), last_name=obj.get('lastName'),
                    email_address=obj.get('email'), address=obj.get('address'), mobile=obj.get('mobile'),
-                   Billing=obj.get('CCOut'), password=obj.get('password'), client=obj.get('client'),
-                   Security_Questions=obj.get('securityQuestions'), professional=obj.get('professional'))
+                   ccout=obj.get('CCOut'), password=obj.get('password'), client=obj.get('client'),
+                   security_questions=obj.get('securityQuestions'), professional=obj.get('professional'))
 
         return usr

@@ -4,6 +4,5 @@ Supports the /user endpoint of the API.
 This is what the user lambda will use to run the majority of code
 """
 
-
 def user_handler(event, context):
     pass

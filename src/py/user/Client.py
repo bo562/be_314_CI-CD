@@ -2,16 +2,20 @@
 py class for client data structure
 """
 from dataclasses import dataclass
-from util.database import Database as db, DatabaseLookups as dl
+from util.database.Database import Database
+from util.database.DatabaseStatus import DatabaseStatus
+from util.database.DatabaseLookups import DatabaseLookups
+
 
 @dataclass
 class Client:
-    client_id: int
+    client_id: int = None
+    user_id: int = None
     subscription_id: int = None
 
     def create_client(self, user_id: int, membership_type):
         try:
-            database = db.Database.database_handler(dl.DatabaseLookups.user.value)  # create database to connect to
+            database = Database.database_handler(DatabaseLookups.user.value)  # create database to connect to
             database.database_connect()  # connect to database
             query = "SELECT user_id FROM project.user WHERE user_id=%d"
             query_data = (user_id)
@@ -42,7 +46,7 @@ class Client:
 
     def update_client(self, user_id: int, membership_type):
         try:
-            database = db.Database.database_handler(dl.DatabaseLookups.user.value)  # create database to connect to
+            database = Database.database_handler(DatabaseLookups.user.value)  # create database to connect to
             database.database_connect()  # connect to database
             query = "SELECT user_id FROM project.user WHERE user_id=%d"
             query_data = (user_id)
@@ -71,9 +75,9 @@ class Client:
         self.clint_id = tclient_id
         database.database_disconnect()
 
-    def get_membershiptype(self):
+    def get_membership_type(self):
         try:
-            database = db.Database.database_handler(dl.DatabaseLookups.user.value)  # create database to connect to
+            database = Database.database_handler(DatabaseLookups.user.value)  # create database to connect to
             database.database_connect()  # connect to database
         except Exception as e:
             print("Database Connection Error")
@@ -85,8 +89,14 @@ class Client:
     @staticmethod
     def ToAPI(obj):
         if isinstance(obj, Client):
+            # take subscription_id and get name
+            database = Database.database_handler(DatabaseLookups.User)
+            database.select('subscription_name', 'subscription')
+            database.where('subscription_id = %s', obj.subscription_id)
+            subscription_name = database.run()
+
             remap = {
-                "membershiptype": obj.subscription_id
+                "membershipType": subscription_name[0][0]
             }
             return remap
 
@@ -94,4 +104,10 @@ class Client:
 
     @staticmethod
     def FromAPI(obj):
-        return Client(client_id=-1, subscription_id=obj.get('membershipType'))
+        # take membership type and return subscription_id
+        database = Database.database_handler(DatabaseLookups.User)
+        database.select('subscription_id', 'subscription')
+        database.where('subscription_name = %s', obj.get('membershipType'))
+        subscription_id = database.run()
+
+        return Client(client_id=-1, subscription_id=subscription_id[0][0])
