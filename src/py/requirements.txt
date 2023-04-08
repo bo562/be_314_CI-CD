@@ -1,3 +1,4 @@
 mysql-connector-python-rf
 boto3
 botocore
+orjson

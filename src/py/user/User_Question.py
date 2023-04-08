@@ -82,3 +82,11 @@ class User_Question:
         query_data = (self.security_question_id)
         return database.database_query(query, query_data)
         database.database_disconnect()
+
+
+    @staticmethod
+    def FromAPI(obj):
+        security_questions = []
+        for val in obj:
+            security_questions.append(User_Question(obj[val]['securityQuestion'], obj[val]['answer']))
+        return security_questions

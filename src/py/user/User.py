@@ -2,11 +2,12 @@
 Class file for user data type
 """
 from dataclasses import dataclass
-from user.Professional import Professional
-from user.Client import Client
-from user.Address import Address
-from user.Billing import Billing
+
 from user.User_Question import User_Question
+from user.Address import Address
+from user.Client import Client
+from user.Professional import Professional
+from user.Billing import Billing
 from util.database.Database import Database
 from util.database.DatabaseLookups import DatabaseLookups
 from util.database.DatabaseStatus import DatabaseStatus
@@ -20,12 +21,11 @@ class User:
     last_name: str = None
     email_address: str = None  # doubles as username
     mobile: str = None
-    password: str = None  # will be hashed
     address: Address = None
+    password: str = None  # will be hashed
     client: Client = None  # possibly null
     professional: Professional = None  # possibly null
-    cc_out: Billing = None
-    cc_in: Billing = None
+    Billing: Billing = None
     Security_Questions: [User_Question] = None
 
     # SQL query to create user in User table
@@ -66,178 +66,35 @@ class User:
         database.database_disconnect()
 
     # return user object (possibly in json form)
-    def get_user(self):
-        my_json = """
-                {
-                  "userID": -1,
-                  "firstname": "Snoop",
-                  "lastname": "Dogg",
-                  "email": "myemail@email.com",
-                  "password": "myPassword123!!",
-                  "mobile": "3344003626",
-                  "address": {
-                    "streetname": "Sesame Street",
-                    "streetnumber": 7,
-                    "suburb": "Liverpool",
-                    "postcode": "2170"
-                  },
-                  "client": {
-                    "membershiptype": "subscription"
-                  },
-                  "professional": {
-                    "services": ["Not", "Implemented", "inDBYet"],
-                    "CCin": {
-                    "CCname": "John",
-                    "CCnumber": "1234 5678 9123 456",
-                    "expirydate": "11/2024",
-                    "cvv": "123",
-                    "billing_type": "In"
-                    }
-                  },
-                  "CCout": {
-                    "CCname": "Johny",
-                    "CCnumber": "1224 5678 9123 456",
-                    "expirydate": "11/2024",
-                    "cvv": "133",
-                    "billing_type": "Out"
-                  },
-                  "securityquestions": [
-                    {
-                      "security_question": "Question 1",
-                      "answer": "Question 1 Answer"
-                    },
-                    {
-                      "security_question": "Question 2",
-                      "answer": "Question 2 Answer"
-                    },
-                    {
-                      "security_question": "Question 3",
-                      "answer": "Question 3 Answer"
-                    }
-                  ]
-                }
-                """
-        user_dict = json.loads(my_json)
-        user_dict['userID'] = self.user_id
-        user_dict['firstname'] = self.firstname
-        user_dict['lastname'] = self.lastname
-        user_dict['email'] = self.email
-        user_dict['password'] = self.password
-        user_dict['mobile'] = self.mobile
-        user_dict['address']['streetname'] = self.address.street_name
-        user_dict['address']['streetnumber'] = self.address.street_number
-        user_dict['address']['suburb'] = self.address.suburb
-        user_dict['address']['postcode'] = self.address.postcode
-        if not self.client is None:
-            user_dict['client']['membershiptype'] = self.client.get_membershiptype()
-        else:
-            user_dict['client'] = {}
-        if not self.professional is None:
-            user_dict['professional']['CCin']['CCname'] = self.cc_in.name
-            user_dict['professional']['CCin']['CCnumber'] = self.cc_in.card_number
-            user_dict['professional']['CCin'][
-                'expirydate'] = "" + self.cc_in.expiry_date.month + "/" + self.cc_in.expiry_date.year
-            user_dict['professional']['CCin']['ccv'] = self.cc_in.cvv
-            user_dict['professional']['CCin']['billing_type'] = "In"
-        else:
-            user_dict['professional'] = {}
-        user_dict['CCout']['CCname'] = self.cc_out.name
-        user_dict['CCout']['CCnumber'] = self.cc_out.card_number
-        user_dict['CCout'][
-            'expirydate'] = "" + self.cc_out.expiry_date.month + "/" + self.cc_out.expiry_date.year
-        user_dict['CCout']['ccv'] = self.cc_out.cvv
-        user_dict['CCout']['billing_type'] = "Out"
-        for question_index in range(3):
-            user_dict['securityquestions'][question_index]['security_question'] = self.security_questions[
-                question_index].get_question()
-            user_dict['securityquestions'][question_index]['answer'] = self.security_questions[
-                question_index].answer
-        return user_dict
+    def get_user(self, obj):
+        pass
 
-    def create_json(self):
-        my_json = """
-        {
-          "userID": -1,
-          "firstname": "Snoop",
-          "lastname": "Dogg",
-          "email": "myemail@email.com",
-          "password": "myPassword123!!",
-          "mobile": "3344003626",
-          "address": {
-            "streetname": "Sesame Street",
-            "streetnumber": 7,
-            "suburb": "Liverpool",
-            "postcode": "2170"
-          },
-          "client": {
-            "membershiptype": "subscription"
-          },
-          "professional": {
-            "services": ["Not", "Implemented", "inDBYet"],
-            "CCin": {
-            "CCname": "John",
-            "CCnumber": "1234 5678 9123 456",
-            "expirydate": "11/2024",
-            "cvv": "123",
-            "billing_type": "In"
+    # customer return type for defined API
+    @staticmethod
+    def ToAPI(obj):
+        if isinstance(obj, User):
+            remap = {
+                "userID": obj.user_id,
+                "firstname": obj.first_name,
+                "lastname": obj.last_name,
+                "email": obj.email_address,
+                "password": obj.password,
+                "mobile": obj.mobile,
+                "address": obj.address,
+                "client": obj.client,
+                "professional": obj.professional,
+                "CCout": obj.Billing
             }
-          },
-          "CCout": {
-            "CCname": "Johny",
-            "CCnumber": "1224 5678 9123 456",
-            "expirydate": "11/2024",
-            "cvv": "133",
-            "billing_type": "Out"
-          },
-          "securityquestions": [
-            {
-              "security_question": "Question 1",
-              "answer": "Question 1 Answer"
-            },
-            {
-              "security_question": "Question 2",
-              "answer": "Question 2 Answer"
-            },
-            {
-              "security_question": "Question 3",
-              "answer": "Question 3 Answer"
-            }
-          ]
-        }
-        """
-        user_dict = json.loads(my_json)
-        user_dict['userID'] = self.user_id
-        user_dict['firstname'] = self.firstname
-        user_dict['lastname'] = self.lastname
-        user_dict['email'] = self.email
-        user_dict['password'] = self.password
-        user_dict['mobile'] = self.mobile
-        user_dict['address']['streetname'] = self.address.street_name
-        user_dict['address']['streetnumber'] = self.address.street_number
-        user_dict['address']['suburb'] = self.address.suburb
-        user_dict['address']['postcode'] = self.address.postcode
-        if not self.client is None:
-            user_dict['client']['membershiptype'] = self.client.get_membershiptype()
-        else:
-            user_dict['client'] = {}
-        if not self.professional is None:
-            user_dict['professional']['CCin']['CCname'] = self.cc_in.name
-            user_dict['professional']['CCin']['CCnumber'] = self.cc_in.card_number
-            user_dict['professional']['CCin'][
-                'expirydate'] = "" + self.cc_in.expiry_date.month + "/" + self.cc_in.expiry_date.year
-            user_dict['professional']['CCin']['ccv'] = self.cc_in.cvv
-            user_dict['professional']['CCin']['billing_type'] = "In"
-        else:
-            user_dict['professional'] = {}
-        user_dict['CCout']['CCname'] = self.cc_out.name
-        user_dict['CCout']['CCnumber'] = self.cc_out.card_number
-        user_dict['CCout'][
-            'expirydate'] = "" + self.cc_out.expiry_date.month + "/" + self.cc_out.expiry_date.year
-        user_dict['CCout']['ccv'] = self.cc_out.cvv
-        user_dict['CCout']['billing_type'] = "Out"
-        for question_index in range(3):
-            user_dict['securityquestions'][question_index]['security_question'] = self.security_questions[
-                question_index].get_question()
-            user_dict['securityquestions'][question_index]['answer'] = self.security_questions[
-                question_index].answer
+            return remap
 
+        raise TypeError
+
+    @staticmethod
+    def FromAPI(obj):
+        # create base user object
+        usr = User(user_id=obj.get('user_id'), first_name=obj.get('firstName'), last_name=obj.get('lastName'),
+                   email_address=obj.get('email'), address=obj.get('address'), mobile=obj.get('mobile'),
+                   Billing=obj.get('CCOut'), password=obj.get('password'), client=obj.get('client'),
+                   Security_Questions=obj.get('securityQuestions'), professional=obj.get('professional'))
+
+        return usr

@@ -2,11 +2,18 @@
 py class for professional data structure
 """
 from dataclasses import dataclass
-from util.database import Database as db, DatabaseLookups as dl
+from service.Service import Service
+from user.Billing import Billing
+
+
 @dataclass
 class Professional:
     professional_id: int
     subscription_id: int = None
+    services: [Service] = None
+    CCin: Billing = None
+    user_id: int = None
+
     def create_professional(self,user_id: int):
         try:
             database = db.Database.database_handler(dl.DatabaseLookups.user.value)  # create database to connect to
@@ -68,3 +75,19 @@ class Professional:
             return "professional creation failed"
         self.professional_id = tprofessional_id
         database.database_disconnect()
+
+    @staticmethod
+    def ToAPI(obj):
+        if isinstance(obj, Professional):
+            remap = {
+                "services": obj.services,
+                "CCin": obj.CCin
+            }
+            return remap
+
+        raise TypeError
+
+    @staticmethod
+    def FromAPI(obj):
+        return Professional(professional_id=-1, subscription_id=-1, services=obj.get('services'), CCin=obj.get('CCin'),
+                            user_id=-1)

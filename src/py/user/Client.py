@@ -81,3 +81,17 @@ class Client:
         query_data = (self.subscription_id)
         return database.database_query(query, query_data)
         database.database_disconnect()
+        
+    @staticmethod
+    def ToAPI(obj):
+        if isinstance(obj, Client):
+            remap = {
+                "membershiptype": obj.subscription_id
+            }
+            return remap
+
+        raise TypeError
+
+    @staticmethod
+    def FromAPI(obj):
+        return Client(client_id=-1, subscription_id=obj.get('membershipType'))
