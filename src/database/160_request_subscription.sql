@@ -5,3 +5,4 @@ CREATE TABLE request_subscription (
      FOREIGN KEY (request_id) REFERENCES request(request_id),
      FOREIGN KEY (subscription_id) REFERENCES subscription(subscription_id)
 );
+

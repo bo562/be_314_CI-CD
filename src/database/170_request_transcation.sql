@@ -5,3 +5,4 @@ CREATE TABLE request_transaction (
      FOREIGN KEY (request_id) REFERENCES request(request_id),
      FOREIGN KEY (transaction_id) REFERENCES transaction(transaction_id)
 );
+
