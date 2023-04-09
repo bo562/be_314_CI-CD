@@ -96,9 +96,9 @@ CREATE TABLE billing (
 CREATE UNIQUE INDEX uc_billing_user_id ON billing(user_id, billing_type_id, retired);
 
 CREATE TABLE security_question (
-	 security_question_id MEDIUMINT NOT NULL AUTO_INCREMENT,
-     question           VARCHAR(2000) NOT NULL,
-     retired            DATETIME NOT NULL,
+	 security_question_id  MEDIUMINT NOT NULL AUTO_INCREMENT,
+     question              VARCHAR(2000) NOT NULL,
+     retired               DATETIME NOT NULL,
      PRIMARY KEY (security_question_id)
 );
 
@@ -112,4 +112,54 @@ CREATE TABLE user_question (
      FOREIGN KEY (user_id) REFERENCES user(user_id)
 );
 CREATE UNIQUE INDEX uc_user_question_question ON user_question(user_id, security_question_id);
+
+CREATE TABLE service (
+	 service_id         MEDIUMINT NOT NULL AUTO_INCREMENT,
+     service_name       VARCHAR(255) NOT NULL,
+     cost               DECIMAL(10,2) NOT NULL,
+     retired            DATETIME NOT NULL,
+     PRIMARY KEY (service_id)
+);
+CREATE UNIQUE INDEX uc_service_name ON service(service_name, retired);
+
+INSERT INTO service (service_name,  cost, retired) values ('Lawn mowing', 120, null);
+INSERT INTO service (service_name,  cost, retired) values ('Weeding', 130, null);
+INSERT INTO service (service_name,  cost, retired) values ('Mulching', 150, null);
+INSERT INTO service (service_name,  cost, retired) values ('Plumbing Repair', 220, null);
+INSERT INTO service (service_name,  cost, retired) values ('Electrical Repair', 250, null);
+INSERT INTO service (service_name,  cost, retired) values ('Whitegoods Installation', 110, null);
+INSERT INTO service (service_name,  cost, retired) values ('Locks changed', 170, null);
+INSERT INTO service (service_name,  cost, retired) values ('Cleaning', 190, null);
+commit;
+
+-- ToDo: rename table to provided_service
+CREATE TABLE associated_service (
+	 provided_service_id MEDIUMINT NOT NULL AUTO_INCREMENT,
+     service_id          MEDIUMINT NOT NULL,
+     professional_id     MEDIUMINT NOT NULL,
+     PRIMARY KEY (provided_service_id),
+     FOREIGN KEY (service_id) REFERENCES service(service_id),
+     FOREIGN KEY (professional_id) REFERENCES professional(professional_id)
+);
+CREATE UNIQUE INDEX uc_associated_service ON 
+	associated_service(professional_id, service_id);
+
+CREATE TABLE authorisation (
+	 authorisation_id   MEDIUMINT NOT NULL AUTO_INCREMENT,
+     user_id            MEDIUMINT NOT NULL,
+     refresh_token      VARCHAR(255) NOT NULL,
+     number_of_uses     INT NOT NULL,   
+     invalidated        ENUM('Y','N') NOT NULL,
+     PRIMARY KEY (authorisation_id),
+     FOREIGN KEY (user_id) REFERENCES user(user_id)
+);
+
+CREATE TABLE session (
+	 session_id         MEDIUMINT NOT NULL AUTO_INCREMENT,
+     authorisation_id   MEDIUMINT NOT NULL,
+     expiry_date        DATETIME NOT NULL,
+     access_token       VARCHAR(255) NOT NULL,
+     PRIMARY KEY (session_id),
+     FOREIGN KEY (authorisation_id) REFERENCES authorisation(authorisation_id)
+);
 
