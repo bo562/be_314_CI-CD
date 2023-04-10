@@ -137,14 +137,22 @@ class User:
         # get results and check if user exists
         results = database.run()
         if len(results) > 0:
-            return {
-                "exists": "True",
-                "pbkey": "MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQBihRpdJQxhxfvRCsPLUUdtQ5FayRLVs9wIYhdoYzs0eey3xE1WLrOfzjNa"
-                         "YB6wsrs2dCBu3PC8sxeTMEe92w8NP0AO4wHu471c4Rtf5JUjVgg5Nu+/n5Npus32UjqaXhbNVIDEOHKpSZKpJh2cKRqfG"
-                         "OuSbiW/Z+WdvOILMoMiPuImQo="
-            }
+            return {"exists": "True"}
         elif len(results) == 0:
-            return {"exists": "False"}
+            return {
+                "exists": "False",
+                "pbkey": "MIICCgKCAgEAxlpvDY1SbHbF+JYO0xSvSXCdOeLiqmTTO9k3FJF6Y7RE9Icwh4q4"
+                        "z7ReQyP05OMB902QjCjzXlvC9prMGj4luRoSfbVOk9Ia5kcO5FEeNt7Xvy0aNSpn"
+                        "EtuwTHumykJDxrTKzOfyR7o7HJM6mGXmA5kS8k/FiPYwSCaewtmt8XlgWxSUWyDo"
+                        "lAe4SuLxyRg4vLpMVCxW/rGgqrNq78vKWeFZBeXnvNHP/cqApUB3Cu3Q5VcF5sq/"
+                        "vUOe3NkilM9e9BSr963/GVsFyg6wL+guAlUPxpNhQY9HTye2BxJQ/DZZFxN9rCaO"
+                        "//ZsUUVCg5k7Z+NjtcKAep82KbwvkGtqAQ+UFSLB8jgOMvX+mfJesAfItfKV52pF"
+                        "Bit/qzKT40KMgWLvDene2d/Ug2HFjK+hX8ikh6S9kIMEwcGPCw4hBd/MK92S/jK2"
+                        "Oy2ZkA29jAclCvq9kh9geaQRMTnIEsvnLmsgEadMgXYAC5VUdTRYYZ6vZffNAbsR"
+                        "0mEvUD9zcCa3KF6c9G0bXjwbZJ0HUn8DKVgnpueXCd9457K7Gst/lwEtlXiY17yD"
+                        "MaVMYtmgmyTzdKmXb643akkYzp2vGlYyK5kRAbiMRqE2xlxRATn76+da9mvpV517"
+                        "lXqCUVC4VUUZDIdOTmptOzpSzGgcowriJVU5TgbQOS//s87GKH+fCqcCAwEAAQ=="
+            }
         else:
             return {"exists": "Not Working"}
 
