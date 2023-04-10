@@ -7,5 +7,5 @@ CREATE TABLE user (
      password           CHAR(100) NOT NULL,
      PRIMARY KEY (user_id)
 );
-CREATE UNIQUE INDEX ak_user_email ON user(email_address);
 
+CREATE UNIQUE INDEX ak_user_email ON user(email_address);
