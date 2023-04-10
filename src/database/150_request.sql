@@ -11,5 +11,6 @@ CREATE TABLE request (
      PRIMARY KEY (request_id),
      FOREIGN KEY (client_id) REFERENCES client(client_id),
      FOREIGN KEY (professional_id) REFERENCES professional(professional_id),
-     FOREIGN KEY (service_id) REFERENCES service(service_id)
+     FOREIGN KEY (service_id) REFERENCES service(service_id),
+     FOREIGN KEY (request_status_id) REFERENCES request_status(request_status_id)
 );
