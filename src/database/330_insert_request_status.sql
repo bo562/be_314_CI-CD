@@ -1,13 +1,13 @@
-INSERT INTO bid_status (request_status_id, status_name) values (1, 'Open');
+INSERT INTO bid_status (status_name) values ('Open');
 
-INSERT INTO bid_status (request_status_id, status_name) values (2, 'Assigned');
+INSERT INTO bid_status (status_name) values ('Assigned');
 
-INSERT INTO bid_status (request_status_id, status_name) values (3, 'In progress');
+INSERT INTO bid_status (status_name) values ('In progress');
 
-INSERT INTO bid_status (request_status_id, status_name) values (3, 'Completed - not paid');
+INSERT INTO bid_status (status_name) values ('Completed - not paid');
 
-INSERT INTO bid_status (request_status_id, status_name) values (3, 'Completed');
+INSERT INTO bid_status (status_name) values ('Completed');
 
-INSERT INTO bid_status (request_status_id, status_name) values (4, 'Cancelled');
+INSERT INTO bid_status (status_name) values ('Cancelled');
 
 COMMIT;

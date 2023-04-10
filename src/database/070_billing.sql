@@ -2,8 +2,8 @@
 CREATE TABLE billing (
      billing_id         MEDIUMINT NOT NULL AUTO_INCREMENT,
      user_id            MEDIUMINT NOT NULL,
-     name               CHAR(100) NOT NULL,
-     card_number        CHAR(10) NOT NULL,
+     name               VARCHAR(100) NOT NULL,
+     card_number        VARCHAR(10) NOT NULL,
      expiry_date        DATE NOT NULL,
      ccv                INT NOT NULL,
      billing_type_id    INT NOT NULL,       

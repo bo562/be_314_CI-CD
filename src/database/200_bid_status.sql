@@ -1,5 +1,5 @@
 CREATE TABLE bid_status (
-     bid_status_id               MEDIUMINT NOT NULL,
+     bid_status_id               INT NOT NULL AUTO_INCREMENT,
      status_name                 VARCHAR(100) NOT NULL,
      PRIMARY KEY (bid_status_id),
 );

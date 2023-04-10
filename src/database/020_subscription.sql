@@ -1,6 +1,6 @@
 CREATE TABLE subscription (
      subscription_id    MEDIUMINT NOT NULL AUTO_INCREMENT,
-     subscription_name  CHAR(100),
+     subscription_name  VARCHAR(100),
      fee                DECIMAL(10,2) NOT NULL,
      PRIMARY KEY (subscription_id)
 );
