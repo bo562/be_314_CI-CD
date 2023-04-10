@@ -47,7 +47,7 @@ class User:
         except errors.IntegrityError as ie:  # in case that user already exists
             if ie.errno == 1452:  # cannot solve gracefully
                 database.disconnect()
-                raise ie
+                raise Exception(f'User Already Exists')
 
             # constructing query to return already created user
             database.clear()
@@ -170,7 +170,7 @@ class User:
                 "address": obj.address,
                 "client": obj.client,
                 "professional": obj.professional,
-                "CCout": obj.ccout
+                "CCOut": obj.ccout
             }
             return remap
 

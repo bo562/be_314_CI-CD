@@ -106,7 +106,7 @@ class Professional:
         if isinstance(obj, Professional):
             remap = {
                 "services": obj.services,
-                "CCin": obj.CCin
+                "CCIn": obj.CCin
             }
             return remap
 
@@ -123,4 +123,4 @@ class Professional:
         results = database.run()
         subscription_id = results[0][0] if results is not None else None
 
-        return Professional(services=obj.get('services'), CCin=obj.get('CCin'), subscription_id=subscription_id)
+        return Professional(services=obj.get('services'), CCin=obj.get('CCIn'), subscription_id=subscription_id)

@@ -59,7 +59,7 @@ class TestPackager(unittest.TestCase):
                         "Fence Installation",
                         "Roof Cleaning"
                     ],
-                    "CCin": {
+                    "CCIn": {
                         "CCName": "Incoming",
                         "CCNumber": "4444 4444 4444 4444",
                         "expiryDate": "11/2025",
