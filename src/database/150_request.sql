@@ -1,5 +1,5 @@
 CREATE TABLE request (
-	 request_id         MEDIUMINT NOT NULL AUTO_INCREMENT,
+     request_id         MEDIUMINT NOT NULL AUTO_INCREMENT,
      client_id          MEDIUMINT NOT NULL,
      service_id         MEDIUMINT NOT NULL,
      request_date       DATETIME NOT NULL,

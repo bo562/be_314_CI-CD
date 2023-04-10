@@ -1,4 +1,3 @@
--- Note: subscription_id points to the most recent subscription
 CREATE TABLE professional (
      professional_id    MEDIUMINT NOT NULL AUTO_INCREMENT,
      user_id            MEDIUMINT NOT NULL,
@@ -7,5 +6,5 @@ CREATE TABLE professional (
      FOREIGN KEY (user_id) REFERENCES user(user_id),
      FOREIGN KEY (subscription_id) REFERENCES subscription(subscription_id)
 );
-CREATE UNIQUE INDEX ak_professional_user_id ON client(user_id);
 
+CREATE UNIQUE INDEX ak_professional_user_id ON client(user_id);

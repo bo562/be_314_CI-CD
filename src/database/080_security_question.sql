@@ -4,4 +4,3 @@ CREATE TABLE security_question (
      retired               DATETIME NOT NULL,
      PRIMARY KEY (security_question_id)
 );
-

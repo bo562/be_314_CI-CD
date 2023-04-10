@@ -7,5 +7,5 @@ CREATE TABLE user_question (
      FOREIGN KEY (security_question_id) REFERENCES security_question(security_question_id),
      FOREIGN KEY (user_id) REFERENCES user(user_id)
 );
-CREATE UNIQUE INDEX uc_user_question_question ON user_question(user_id, security_question_id);
 
+CREATE UNIQUE INDEX uc_user_question_question ON user_question(user_id, security_question_id);
