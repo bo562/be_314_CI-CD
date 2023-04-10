@@ -4,6 +4,46 @@
   
   
 -- ---------------------------- 
+-- From: 000_drop_all.sql 
+DROP PROCEDURE IF EXISTS `drop_all_tables`;
+
+DELIMITER $$
+CREATE PROCEDURE `drop_all_tables`()
+BEGIN
+    DECLARE _done INT DEFAULT FALSE;
+    DECLARE _tableName VARCHAR(255);
+    DECLARE _cursor CURSOR FOR
+        SELECT table_name 
+        FROM information_schema.TABLES
+        WHERE table_schema = "id20582666_tradiesystem";
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET _done = TRUE;
+
+    SET FOREIGN_KEY_CHECKS = 0;
+
+    OPEN _cursor;
+
+    REPEAT FETCH _cursor INTO _tableName;
+
+    IF NOT _done THEN
+        SET @stmt_sql = CONCAT('DROP TABLE `', _tableName, '`');
+        PREPARE stmt1 FROM @stmt_sql;
+        EXECUTE stmt1;
+        DEALLOCATE PREPARE stmt1;
+    END IF;
+
+    UNTIL _done END REPEAT;
+
+    CLOSE _cursor;
+    SET FOREIGN_KEY_CHECKS = 1;
+END$$
+
+DELIMITER ;
+
+CALL drop_all_tables(); 
+
+DROP PROCEDURE IF EXISTS `drop_all_tables`;  
+  
+-- ---------------------------- 
 -- From: 010_user.sql 
 CREATE TABLE user (
      user_id            MEDIUMINT NOT NULL AUTO_INCREMENT,
@@ -129,12 +169,11 @@ CREATE TABLE service (
      service_id         INT NOT NULL AUTO_INCREMENT,
      service_name       VARCHAR(255) NOT NULL,
      cost               DECIMAL(10,2) NOT NULL,
-     retired            DATETIME NOT NULL,
+     retired            DATETIME,
      PRIMARY KEY (service_id)
 );
 
 CREATE UNIQUE INDEX uc_service_name ON service(service_name, retired);
-
   
   
 -- ---------------------------- 
@@ -234,7 +273,7 @@ CREATE TABLE transaction (
      billing_id              MEDIUMINT NOT NULL,
      PRIMARY KEY (transaction_id),
      FOREIGN KEY (user_id) REFERENCES user(user_id),
-     FOREIGN KEY (billing_type_id) REFERENCES billing_type(billing_type_id)
+     FOREIGN KEY (billing_type_id) REFERENCES billing_type(billing_type_id),
      FOREIGN KEY (billing_id) REFERENCES billing(billing_id)
 );
 
@@ -255,7 +294,7 @@ CREATE TABLE request_transaction (
 CREATE TABLE bid_status (
      bid_status_id               INT NOT NULL AUTO_INCREMENT,
      status_name                 VARCHAR(100) NOT NULL,
-     PRIMARY KEY (bid_status_id),
+     PRIMARY KEY (bid_status_id)
 );
 
 CREATE UNIQUE INDEX uc_bid_status_name ON bid_status(status_name);  
@@ -294,37 +333,37 @@ COMMIT;
   
 -- ---------------------------- 
 -- From: 320_insert_service.sql 
-INSERT INTO service (service_name,  cost, retired) values ('Lawn mowing', 120, null);
+INSERT INTO service (service_name,  cost) values ('Lawn mowing', 120.00);
 
-INSERT INTO service (service_name,  cost, retired) values ('Weeding', 130, null);
+INSERT INTO service (service_name,  cost) values ('Weeding', 130.00);
 
-INSERT INTO service (service_name,  cost, retired) values ('Mulching', 150, null);
+INSERT INTO service (service_name,  cost) values ('Mulching', 150.00);
 
-INSERT INTO service (service_name,  cost, retired) values ('Plumbing Repair', 220, null);
+INSERT INTO service (service_name,  cost) values ('Plumbing Repair', 220.00);
 
-INSERT INTO service (service_name,  cost, retired) values ('Electrical Repair', 250, null);
+INSERT INTO service (service_name,  cost) values ('Electrical Repair', 250.00);
 
-INSERT INTO service (service_name,  cost, retired) values ('Whitegoods Installation', 110, null);
+INSERT INTO service (service_name,  cost) values ('Whitegoods Installation', 110.00);
 
-INSERT INTO service (service_name,  cost, retired) values ('Locks changed', 170, null);
+INSERT INTO service (service_name,  cost) values ('Locks changed', 170.00);
 
-INSERT INTO service (service_name,  cost, retired) values ('Cleaning', 190, null);
+INSERT INTO service (service_name,  cost) values ('Cleaning', 190.00);
 
 commit;  
   
 -- ---------------------------- 
 -- From: 330_insert_request_status.sql 
-INSERT INTO bid_status (status_name) values ('Open');
+INSERT INTO request_status (status_name) values ('Open');
 
-INSERT INTO bid_status (status_name) values ('Assigned');
+INSERT INTO request_status (status_name) values ('Assigned');
 
-INSERT INTO bid_status (status_name) values ('In progress');
+INSERT INTO request_status (status_name) values ('In progress');
 
-INSERT INTO bid_status (status_name) values ('Completed - not paid');
+INSERT INTO request_status (status_name) values ('Completed - not paid');
 
-INSERT INTO bid_status (status_name) values ('Completed');
+INSERT INTO request_status (status_name) values ('Completed');
 
-INSERT INTO bid_status (status_name) values ('Cancelled');
+INSERT INTO request_status (status_name) values ('Cancelled');
 
 COMMIT;  
   

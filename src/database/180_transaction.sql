@@ -8,7 +8,7 @@ CREATE TABLE transaction (
      billing_id              MEDIUMINT NOT NULL,
      PRIMARY KEY (transaction_id),
      FOREIGN KEY (user_id) REFERENCES user(user_id),
-     FOREIGN KEY (billing_type_id) REFERENCES billing_type(billing_type_id)
+     FOREIGN KEY (billing_type_id) REFERENCES billing_type(billing_type_id),
      FOREIGN KEY (billing_id) REFERENCES billing(billing_id)
 );
 
