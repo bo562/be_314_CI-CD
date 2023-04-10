@@ -10,7 +10,7 @@ from mysql.connector import errors
 
 @dataclass
 class Address:
-    address_id: int
+    address_id: int = None
     street_number: str = None
     street_name: str = None
     suburb: str = None
@@ -55,35 +55,42 @@ class Address:
         return self
 
     def update_address(self, user_id: int):
-        try:
-            database = Database.database_handler(DatabaseLookups.user.value)  # create database to connect to
-            database.database_connect()  # connect to database
-            query = "SELECT user_id FROM project.user WHERE user_id=%d"
-            query_data = user_id
-            validation_check = database.database_query(query, query_data)
-            if not isinstance(validation_check, int) or validation_check < 0:
-                return "invalid id"
-        except Exception as e:
-            print("Database Connection Error")
-        query = ("UPDATE project.address "
-                 "SET street_number = %s, street_name = %s, suburb = %s, postcode = %s "
-                 "WHERE user_id = %d")
-        query_data = ( self.street_number, self.street_name, self.suburb, self.postcode, user_id)
-        database.database_query(query, query_data)
-        query = "SELECT address_id FROM project.address WHERE user_id=%d"
-        query_data = user_id
-        temp_address_id = database.database_query(query, query_data)
-        if temp_address_id is None:
-            return "address update failed"
-        self.address_id = temp_address_id
-        database.database_disconnect()
+        database = Database.database_handler(DatabaseLookups.User)  # create database connection
+
+        # check if database is connected, if not connect
+        if database.status is DatabaseStatus.Disconnected:
+            database.connect()
+
+        elif database.status is DatabaseStatus.NoImplemented:
+            raise errors.InternalError  # change with mysql errors
+
+        # attempt to create billing object
+        if self.user_id is None:
+            self.user_id = user_id
+
+        # create query
+        database.clear()
+        database.update(self, 'address', ('address_id',))
+        database.where('user_id = %s', self.user_id)
+
+        try:  # attempt to return
+            self.address_id = database.run()
+            database.commit()
+
+        except errors.IntegrityError as ie:
+            raise ie
+
+        # clear database tool
+        database.clear()
+
+        return self
 
     @staticmethod
     def ToAPI(obj):
         if isinstance(obj, Address):
             remap = {
-                "streetname": obj.street_name,
-                "streetnumber": obj.street_number,
+                "streetName": obj.street_name,
+                "streetNumber": obj.street_number,
                 "suburb": obj.suburb,
                 "postcode": obj.postcode
             }

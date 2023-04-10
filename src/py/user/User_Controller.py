@@ -34,10 +34,13 @@ class User_Controller:
         elif '/user/updateUser' in self.__context.get('resource-path'):  # since the path will contain the user id
             return self.update_user()
 
+        elif self.__context.get('resource-path') == '/user/validate':
+            return self.validate_user()
+
     def create_user(self) -> User:
         try:
             json_body = self.__event.get('body-json')
-            usr = Decoder(json_body, 'User').deserialize()
+            usr = Decoder(json.dumps(json_body), 'User').deserialize()
             new_user = usr.create_user()
 
         except Exception as e:
@@ -45,9 +48,26 @@ class User_Controller:
 
         try:
             encoded = Encoder(new_user).serialize()
+            return encoded
 
         except Exception as e:
             raise e
 
     def update_user(self) -> User:
-        pass
+        try:
+            json_body = self.__event.get('body-json')
+            usr = Decoder(json.dumps(json_body), 'User').deserialize()
+            updated_user = usr.update_user()
+
+        except Exception as e:
+            raise e
+
+        try:
+            encoded = Encoder(updated_user).serialize()
+            return encoded
+
+        except Exception as e:
+            raise e
+
+    def validate_user(self) -> dict:
+        return User.validate_email(self.__context.get('email_address'))

@@ -32,19 +32,30 @@ class Decoder:
         if 'user_id' in obj.keys():  # checking for main user object
             return User.FromAPI(obj)
 
-        elif 'CCName' in obj.keys():  # checking for CCOut field
+        elif 'CCName' in obj.keys() or \
+                'CCNumber' in obj.keys() or \
+                'expiryDate' in obj.keys() or \
+                'CCV' in obj.keys() or \
+                'billingType' in obj.keys():  # checking for CCOut field
             return Billing.FromAPI(obj)
 
-        elif 'streetName' in obj.keys():  # checking for address field
+        # checking for address field
+        elif 'streetName' in obj.keys() or \
+                'streetNumber' in obj.keys() or \
+                'suburb' in obj.keys() or \
+                'postcode' in obj.keys():
             return Address.FromAPI(obj)
 
         elif 'membershipType' in obj.keys():  # checking for client field
             return Client.FromAPI(obj)
 
-        elif 'CCin' in obj.keys():  # checking for professional field
+        elif 'CCin' in obj.keys() or \
+                'services' in obj.keys():  # checking for professional field
             return Professional.FromAPI(obj)
 
-        elif 'securityQuestion1' in obj.keys():  # checking for security question field
+        elif 'securityQuestion1' in obj.keys() or \
+                'securityQuestion2' in obj.keys() or \
+                'securityQuestion3' in obj.keys():  # checking for security question field
             return User_Question.FromAPI(obj)
 
         else:

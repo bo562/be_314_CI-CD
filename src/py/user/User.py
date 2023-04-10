@@ -55,13 +55,17 @@ class User:
             database.where('email_address = %s', self.email_address)
 
             # run query and return user_id
-            self.user_id = database.run()[0]
+            self.user_id = database.run()[0][0]
             return self
 
         # add nested classes
         database.clear()
         self.ccout.create_billing(self.user_id)
         self.address.create_address(self.user_id)
+
+        # due to multiple questions, need to loop and call
+        for security_question in self.security_questions:
+            security_question.create_question(self.user_id)
 
         # conditional nesting (may not occur for all users)
         if self.client is not None:
@@ -76,41 +80,82 @@ class User:
         return self
 
     def update_user(self):
+        database = Database.database_handler(DatabaseLookups.User)  # create database instance
+
+        # check if database is connected, if not connect
+        if database.status is DatabaseStatus.Disconnected:
+            database.connect()
+
+        # attempt to create base user
+        database.clear()
+        database.update(self, 'user', ('user_id', 'address', 'ccout', 'client', 'professional', 'security_questions'))
+        database.where('user_id = %s', self.user_id)
+
+        # run database query and commit
         try:
-            database = Database.database_handler(DatabaseLookups.User.value)  # create database to connect to
-            database.database_connect()  # connect to database
-            query = "SELECT user_id FROM project.user WHERE user_id=%d"
-            query_data = self.user_id
-            validation_check = database.database_query(query, query_data)
-            if not isinstance(validation_check, int) or validation_check < 0:
-                return "invalid id"
-        except Exception as e:
-            print("Database Connection Error")
-        query = ("UPDATE project.user "
-                 "firstname = %s, lastname = %s, email_address = %s, mobile = %s, password = %s "
-                 "WHERE user_id = %d")
-        query_data = (self.firstname, self.lastname, self.email_address, self.mobile, self.password, self.user_id)
-        database.database_query(query, query_data)
-        query = "SELECT user_id FROM project.user WHERE email_address=%s"
-        query_data = self.email_address
-        tuser_id = database.database_query(query, query_data)
-        if not isinstance(tuser_id, int) or tuser_id < 0:
-            return "User update Failed"
-        self.user_id = tuser_id
-        database.database_disconnect()
+            database.run()
+            database.commit()
+
+        except errors.IntegrityError as ie:  # in case that user already exists
+            raise ie
+
+        except Exception as e:  # other unhandled exceptions
+            raise e
+
+        # conditional nesting (may not occur for all user updates)
+        if self.ccout is not None:
+            self.ccout.update_billing(self.user_id)
+
+        if self.address is not None:
+            self.address.update_address(self.user_id)
+
+        if self.client is not None:
+            self.client.update_client(self.user_id)
+
+        if self.professional is not None:
+            self.professional.update_professional(self.user_id)
+
+        # commit and close database connection
+        database.disconnect()
+
+        return self
 
     # return user object (possibly in json form)
     def get_user(self, obj):
         pass
+
+    @staticmethod
+    def validate_email(email):
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # create database query
+        database.clear()
+        database.select(('user_id',), 'user')
+        database.where('email_address = %s', email)
+
+        # get results and check if user exists
+        results = database.run()
+        if len(results) > 0:
+            return {
+                "exists": "True",
+                "pbkey": "MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQBihRpdJQxhxfvRCsPLUUdtQ5FayRLVs9wIYhdoYzs0eey3xE1WLrOfzjNa"
+                         "YB6wsrs2dCBu3PC8sxeTMEe92w8NP0AO4wHu471c4Rtf5JUjVgg5Nu+/n5Npus32UjqaXhbNVIDEOHKpSZKpJh2cKRqfG"
+                         "OuSbiW/Z+WdvOILMoMiPuImQo="
+            }
+        elif len(results) == 0:
+            return {"exists": "False"}
+        else:
+            return {"exists": "Not Working"}
 
     # customer return type for defined API
     @staticmethod
     def ToAPI(obj):
         if isinstance(obj, User):
             remap = {
-                "userID": obj.user_id,
-                "firstname": obj.first_name,
-                "lastname": obj.last_name,
+                "user_id": obj.user_id,
+                "firstName": obj.first_name,
+                "lastName": obj.last_name,
                 "email": obj.email_address,
                 "password": obj.password,
                 "mobile": obj.mobile,
