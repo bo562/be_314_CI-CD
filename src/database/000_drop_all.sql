@@ -1,37 +1,25 @@
-DROP PROCEDURE IF EXISTS `drop_all_tables`;
+SET FOREIGN_KEY_CHECKS = 0;
 
-DELIMITER $$
-CREATE PROCEDURE `drop_all_tables`()
-BEGIN
-    DECLARE _done INT DEFAULT FALSE;
-    DECLARE _tableName VARCHAR(255);
-    DECLARE _cursor CURSOR FOR
-        SELECT table_name 
-        FROM information_schema.TABLES
-        WHERE table_schema = "id20582666_tradiesystem";
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET _done = TRUE;
+DROP TABLE IF EXISTS address;
+DROP TABLE IF EXISTS associated_service;
+DROP TABLE IF EXISTS authorisation;
+DROP TABLE IF EXISTS bid_status;
+DROP TABLE IF EXISTS billing;
+DROP TABLE IF EXISTS billing_type;
+DROP TABLE IF EXISTS client;
+DROP TABLE IF EXISTS professional;
+DROP TABLE IF EXISTS request;
+DROP TABLE IF EXISTS request_bid;
+DROP TABLE IF EXISTS request_status;
+DROP TABLE IF EXISTS request_subscription;
+DROP TABLE IF EXISTS request_transaction;
+DROP TABLE IF EXISTS security_question;
+DROP TABLE IF EXISTS service;
+DROP TABLE IF EXISTS session;
+DROP TABLE IF EXISTS subscription;
+DROP TABLE IF EXISTS transaction;
+DROP TABLE IF EXISTS transaction_status;
+DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS user_question;
 
-    SET FOREIGN_KEY_CHECKS = 0;
-
-    OPEN _cursor;
-
-    REPEAT FETCH _cursor INTO _tableName;
-
-    IF NOT _done THEN
-        SET @stmt_sql = CONCAT('DROP TABLE `', _tableName, '`');
-        PREPARE stmt1 FROM @stmt_sql;
-        EXECUTE stmt1;
-        DEALLOCATE PREPARE stmt1;
-    END IF;
-
-    UNTIL _done END REPEAT;
-
-    CLOSE _cursor;
-    SET FOREIGN_KEY_CHECKS = 1;
-END$$
-
-DELIMITER ;
-
-CALL drop_all_tables(); 
-
-DROP PROCEDURE IF EXISTS `drop_all_tables`;
+SET FOREIGN_KEY_CHECKS = 1;

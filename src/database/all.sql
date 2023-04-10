@@ -5,43 +5,31 @@
   
 -- ---------------------------- 
 -- From: 000_drop_all.sql 
-DROP PROCEDURE IF EXISTS `drop_all_tables`;
+SET FOREIGN_KEY_CHECKS = 0;
 
-DELIMITER $$
-CREATE PROCEDURE `drop_all_tables`()
-BEGIN
-    DECLARE _done INT DEFAULT FALSE;
-    DECLARE _tableName VARCHAR(255);
-    DECLARE _cursor CURSOR FOR
-        SELECT table_name 
-        FROM information_schema.TABLES
-        WHERE table_schema = "id20582666_tradiesystem";
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET _done = TRUE;
+DROP TABLE IF EXISTS address;
+DROP TABLE IF EXISTS associated_service;
+DROP TABLE IF EXISTS authorisation;
+DROP TABLE IF EXISTS bid_status;
+DROP TABLE IF EXISTS billing;
+DROP TABLE IF EXISTS billing_type;
+DROP TABLE IF EXISTS client;
+DROP TABLE IF EXISTS professional;
+DROP TABLE IF EXISTS request;
+DROP TABLE IF EXISTS request_bid;
+DROP TABLE IF EXISTS request_status;
+DROP TABLE IF EXISTS request_subscription;
+DROP TABLE IF EXISTS request_transaction;
+DROP TABLE IF EXISTS security_question;
+DROP TABLE IF EXISTS service;
+DROP TABLE IF EXISTS session;
+DROP TABLE IF EXISTS subscription;
+DROP TABLE IF EXISTS transaction;
+DROP TABLE IF EXISTS transaction_status;
+DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS user_question;
 
-    SET FOREIGN_KEY_CHECKS = 0;
-
-    OPEN _cursor;
-
-    REPEAT FETCH _cursor INTO _tableName;
-
-    IF NOT _done THEN
-        SET @stmt_sql = CONCAT('DROP TABLE `', _tableName, '`');
-        PREPARE stmt1 FROM @stmt_sql;
-        EXECUTE stmt1;
-        DEALLOCATE PREPARE stmt1;
-    END IF;
-
-    UNTIL _done END REPEAT;
-
-    CLOSE _cursor;
-    SET FOREIGN_KEY_CHECKS = 1;
-END$$
-
-DELIMITER ;
-
-CALL drop_all_tables(); 
-
-DROP PROCEDURE IF EXISTS `drop_all_tables`;  
+SET FOREIGN_KEY_CHECKS = 1;  
   
 -- ---------------------------- 
 -- From: 010_user.sql 
@@ -238,7 +226,8 @@ CREATE TABLE request (
      PRIMARY KEY (request_id),
      FOREIGN KEY (client_id) REFERENCES client(client_id),
      FOREIGN KEY (professional_id) REFERENCES professional(professional_id),
-     FOREIGN KEY (service_id) REFERENCES service(service_id)
+     FOREIGN KEY (service_id) REFERENCES service(service_id),
+     FOREIGN KEY (request_status_id) REFERENCES request_status(request_status_id)
 );  
   
 -- ---------------------------- 
@@ -274,7 +263,8 @@ CREATE TABLE transaction (
      PRIMARY KEY (transaction_id),
      FOREIGN KEY (user_id) REFERENCES user(user_id),
      FOREIGN KEY (billing_type_id) REFERENCES billing_type(billing_type_id),
-     FOREIGN KEY (billing_id) REFERENCES billing(billing_id)
+     FOREIGN KEY (billing_id) REFERENCES billing(billing_id),
+     FOREIGN KEY (transaction_status_id) REFERENCES transaction_status(transaction_status_id)
 );
 
 CREATE INDEX idx_transaction_date ON transaction(user_id, transaction_date);  
