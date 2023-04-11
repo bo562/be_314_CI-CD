@@ -38,16 +38,18 @@ class Database:
     @staticmethod
     def database_handler(secret_name):
         # retrieve secret from aws
+        """ # issues with aws
         try:
             secret = Database.get_secret(secret_name)
             mysql_info = json.loads(secret)
         except Exception as e:
             raise e
+        """
 
         # attempt database connection
         try:
-            database = Database(mysql_info['host'], mysql_info['database'],
-                                mysql_info['username'], mysql_info['password'])
+            database = Database('csit314-gp.crjrzvrrbory.us-east-1.rds.amazonaws.com', 'Project',
+                                'user_lambda', 'uDb+J5Jr7vV)ek>')
         except Error as err:
             raise err
 
