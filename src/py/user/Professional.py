@@ -101,6 +101,22 @@ class Professional:
 
         return self
 
+    def delete_professional(self):
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+        database.clear()
+
+        database.delete('professional')
+        database.where('professional_id = %s', self.professional_id)
+
+        try:
+            database.run()
+            database.commit()
+        except Exception as e:
+            return False
+
+        return True
+
     @staticmethod
     def ToAPI(obj):
         if isinstance(obj, Professional):

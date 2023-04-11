@@ -37,21 +37,27 @@ class User_Controller:
         elif self.__context.get('resource-path') == '/user/validate':
             return self.validate_user()
 
-    def create_user(self) -> User:
+    def create_user(self) -> object:
         try:
             json_body = self.__event.get('body-json')
             usr = Decoder(json.dumps(json_body), 'User').deserialize()
             new_user = usr.create_user()
 
         except Exception as e:
-            raise e
+            return {
+                "statusCode": "500",
+                "error": e.args
+            }
 
         try:
             encoded = Encoder(new_user).serialize()
             return encoded
 
         except Exception as e:
-            raise e
+            return {
+                "statusCode": "500",
+                "error": e.args
+            }
 
     def update_user(self) -> User:
         try:

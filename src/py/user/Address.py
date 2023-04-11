@@ -85,6 +85,22 @@ class Address:
 
         return self
 
+    def delete_address(self):
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+        database.clear()
+
+        database.delete('address')
+        database.where('address_id = %s', self.address_id)
+
+        try:
+            database.run()
+            database.commit()
+        except Exception as e:
+            return False
+
+        return True
+
     @staticmethod
     def ToAPI(obj):
         if isinstance(obj, Address):

@@ -84,6 +84,21 @@ class User_Question:
         self.user_question_id = temp_user_question_id
         database.database_disconnect()
 
+    def delete_security_question(self):
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+        database.clear()
+
+        database.delete('user_question')
+        database.where('user_question_id = %s', self.security_question_id)
+
+        try:
+            database.run()
+        except Exception as e:
+            return False
+
+        return True
+
     def get_question(self):
         try:
             database = Database.database_handler(DatabaseLookups.user.value)  # create database to connect to

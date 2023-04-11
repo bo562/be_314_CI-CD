@@ -51,7 +51,7 @@ class User:
 
             # constructing query to return already created user
             database.clear()
-            database.select(('user_id', ), 'user')
+            database.select(('user_id',), 'user')
             database.where('email_address = %s', self.email_address)
 
             # run query and return user_id
@@ -60,19 +60,43 @@ class User:
 
         # add nested classes
         database.clear()
-        self.ccout.create_billing(self.user_id)
-        self.address.create_address(self.user_id)
+        self.ccout = self.ccout.create_billing(self.user_id)
+
+        # check if creation was successful
+        if self.ccout is None:
+            self.delete_user()
+            raise Exception(f'User Creation Failed Due to Billing')
+
+        self.address = self.address.create_address(self.user_id)
+
+        # check if creation was successful
+        if self.address is None:
+            self.delete_user()
+            raise Exception(f'User Creation Failed Due to Address')
 
         # due to multiple questions, need to loop and call
+        security_questions = []
         for security_question in self.security_questions:
-            security_question.create_question(self.user_id)
+            result = security_question.create_question(self.user_id)
+            security_questions.append(result)
+            if result is None:
+                self.delete_user()
+                raise Exception(f'User Creation Failed Due to Security Questions')
 
         # conditional nesting (may not occur for all users)
         if self.client is not None:
-            self.client.create_client(self.user_id)
+            self.client = self.client.create_client(self.user_id)
+
+            if self.client is None:
+                self.delete_user()
+                raise Exception(f'User Creation Failed Due to Address')
 
         if self.professional is not None:
             self.professional.create_professional(self.user_id)
+
+            if self.professional is None:
+                self.delete_user()
+                raise Exception(f'User Creation Failed Due to Professional')
 
         # commit and close database connection
         database.disconnect()
@@ -120,6 +144,34 @@ class User:
 
         return self
 
+    # delete entire user object
+    def delete_user(self) -> None:
+        # delete nested objects first
+        try:
+            if self.ccout is not None: self.ccout.delete_billing()
+            if self.address is not None: self.address.delete_address()
+            if self.client is not None: self.client.delete_client()
+            if self.professional is not None: self.professional.delete_professional()
+            if len(self.security_questions) != 0:
+                for security_question in self.security_questions:
+                    security_question.delete_security_question()
+
+        except Exception as e:  # something has really gone wrong and is not fixable
+            raise e
+
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+        database.clear()
+
+        database.delete('user')
+        database.where('user_id = %s', self.user_id)
+
+        try:
+            database.run()
+            database.commit()
+        except Exception as e:
+            raise e
+
     # return user object (possibly in json form)
     def get_user(self, obj):
         pass
@@ -142,16 +194,16 @@ class User:
             return {
                 "exists": "False",
                 "pbkey": "MIICCgKCAgEAxlpvDY1SbHbF+JYO0xSvSXCdOeLiqmTTO9k3FJF6Y7RE9Icwh4q4"
-                        "z7ReQyP05OMB902QjCjzXlvC9prMGj4luRoSfbVOk9Ia5kcO5FEeNt7Xvy0aNSpn"
-                        "EtuwTHumykJDxrTKzOfyR7o7HJM6mGXmA5kS8k/FiPYwSCaewtmt8XlgWxSUWyDo"
-                        "lAe4SuLxyRg4vLpMVCxW/rGgqrNq78vKWeFZBeXnvNHP/cqApUB3Cu3Q5VcF5sq/"
-                        "vUOe3NkilM9e9BSr963/GVsFyg6wL+guAlUPxpNhQY9HTye2BxJQ/DZZFxN9rCaO"
-                        "//ZsUUVCg5k7Z+NjtcKAep82KbwvkGtqAQ+UFSLB8jgOMvX+mfJesAfItfKV52pF"
-                        "Bit/qzKT40KMgWLvDene2d/Ug2HFjK+hX8ikh6S9kIMEwcGPCw4hBd/MK92S/jK2"
-                        "Oy2ZkA29jAclCvq9kh9geaQRMTnIEsvnLmsgEadMgXYAC5VUdTRYYZ6vZffNAbsR"
-                        "0mEvUD9zcCa3KF6c9G0bXjwbZJ0HUn8DKVgnpueXCd9457K7Gst/lwEtlXiY17yD"
-                        "MaVMYtmgmyTzdKmXb643akkYzp2vGlYyK5kRAbiMRqE2xlxRATn76+da9mvpV517"
-                        "lXqCUVC4VUUZDIdOTmptOzpSzGgcowriJVU5TgbQOS//s87GKH+fCqcCAwEAAQ=="
+                         "z7ReQyP05OMB902QjCjzXlvC9prMGj4luRoSfbVOk9Ia5kcO5FEeNt7Xvy0aNSpn"
+                         "EtuwTHumykJDxrTKzOfyR7o7HJM6mGXmA5kS8k/FiPYwSCaewtmt8XlgWxSUWyDo"
+                         "lAe4SuLxyRg4vLpMVCxW/rGgqrNq78vKWeFZBeXnvNHP/cqApUB3Cu3Q5VcF5sq/"
+                         "vUOe3NkilM9e9BSr963/GVsFyg6wL+guAlUPxpNhQY9HTye2BxJQ/DZZFxN9rCaO"
+                         "//ZsUUVCg5k7Z+NjtcKAep82KbwvkGtqAQ+UFSLB8jgOMvX+mfJesAfItfKV52pF"
+                         "Bit/qzKT40KMgWLvDene2d/Ug2HFjK+hX8ikh6S9kIMEwcGPCw4hBd/MK92S/jK2"
+                         "Oy2ZkA29jAclCvq9kh9geaQRMTnIEsvnLmsgEadMgXYAC5VUdTRYYZ6vZffNAbsR"
+                         "0mEvUD9zcCa3KF6c9G0bXjwbZJ0HUn8DKVgnpueXCd9457K7Gst/lwEtlXiY17yD"
+                         "MaVMYtmgmyTzdKmXb643akkYzp2vGlYyK5kRAbiMRqE2xlxRATn76+da9mvpV517"
+                         "lXqCUVC4VUUZDIdOTmptOzpSzGgcowriJVU5TgbQOS//s87GKH+fCqcCAwEAAQ=="
             }
         else:
             return {"exists": "Not Working"}

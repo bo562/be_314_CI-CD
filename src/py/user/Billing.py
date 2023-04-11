@@ -38,7 +38,8 @@ class Billing:
 
         except errors.IntegrityError as ie:
             if ie.errno == 1452:  # cannot solve gracefully
-                raise ie
+                database.clear()
+                return None
 
             # return billing data, get billing type first
             database.clear()
@@ -88,12 +89,28 @@ class Billing:
             database.commit()
 
         except errors.IntegrityError as ie:
-            raise ie
+            return None
 
         # clear database tool
         database.clear()
 
         return self
+
+    def delete_billing(self) -> bool:
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+        database.clear()
+
+        database.delete('billing')
+        database.where('billing_id = %s', self.billing_id)
+
+        try:
+            database.run()
+            database.commit()
+        except Exception as e:
+            return False
+
+        return True
 
     @staticmethod
     def ToAPI(obj):

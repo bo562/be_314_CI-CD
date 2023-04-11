@@ -81,6 +81,22 @@ class Client:
 
         return self
 
+    def delete_client(self):
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+        database.clear()
+
+        database.delete('client')
+        database.where('client_id = %s', self.client_id)
+
+        try:
+            database.run()
+            database.commit()
+        except Exception as e:
+            return False
+
+        return True
+
     def get_membership_type(self):
         try:
             database = Database.database_handler(DatabaseLookups.user.value)  # create database to connect to
