@@ -38,16 +38,18 @@ class Database:
     @staticmethod
     def database_handler(secret_name):
         # retrieve secret from aws
+        """ # issues with aws
         try:
             secret = Database.get_secret(secret_name)
             mysql_info = json.loads(secret)
         except Exception as e:
             raise e
+        """
 
         # attempt database connection
         try:
-            database = Database(mysql_info['host'], mysql_info['database'],
-                                mysql_info['username'], mysql_info['password'])
+            database = Database('csit314-gp.crjrzvrrbory.us-east-1.rds.amazonaws.com', 'Project',
+                                'user_lambda', 'uDb+J5Jr7vV)ek>')
         except Error as err:
             raise err
 
@@ -170,7 +172,15 @@ class Database:
 
     # query augmenting
     def where(self, clause: str, value: str):
-        self.__query += "WHERE " + clause + " "  # extra space for adding more query
+        self.__query += "WHERE " + clause + " "  # extra space for adding more queries
+        self.__data.append(value)
+
+    def ampersand(self, clause: str, value: str):
+        self.__query += 'AND ' + clause + ' '  # extra space for adding more queries
+        self.__data.append(value)
+
+    def bar(self, clause: str, value: str):
+        self.__query += 'OR ' + clause + ' '  # extra space for adding more queries
         self.__data.append(value)
 
     # query actions
@@ -203,7 +213,6 @@ class Database:
             # all other queries should return row id
             else:
                 result = self.query(self.__query, self.__data, return_id=True)
-                self.commit()
                 return result
 
         except Error as err:  # simple error handling if works return true otherwise return false
@@ -214,8 +223,8 @@ class Database:
 
     def clear(self):
         self.__table: str = None
-        self.__columns = []
-        self.__data = []
+        self.__columns.clear()
+        self.__data.clear()
         self.__query: str = ""
 
         # close cursor

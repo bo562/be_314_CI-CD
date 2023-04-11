@@ -145,6 +145,15 @@ class TestDatabase(unittest.TestCase):
 
         print(results)
 
+    def test_temp(self):
+        # connect to database
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # create database query
+        database.clear()
+        database.select(('service_id', 'service_name', 'cost', 'retired'), 'service')
+        database.where('service_name = %s', 'Tree')
+
     def tearDown(self) -> None:
         pass
 
