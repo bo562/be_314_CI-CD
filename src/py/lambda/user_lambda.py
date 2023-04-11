@@ -9,4 +9,4 @@ from user.User_Controller import User_Controller
 def user_handler(event, context):
     user_controller = User_Controller.Event_Start(event=event)
 
-    return user_controller.handle_event()
+    return user_controller
