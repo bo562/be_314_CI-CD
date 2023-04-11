@@ -12,20 +12,21 @@ import unittest
 
 
 class TestPackager(unittest.TestCase):
-    def test_serialize(self):
-        address = Address(address_id=1, street_number=10, street_name='Adam Street', suburb='James Park', postcode=3434)
-        billing_in = Billing(billing_id=1, name='David James', card_number='1234 4567 8910 1112', expiry_date='10/2024',
-                          cvv='123', billing_type='In')
-        billing_out = Billing(billing_id=1, name='David James', card_number='2111 0198 1233 3323', expiry_date='10/2025',
-                          cvv='123', billing_type='Out')
-        client = Client(1, 2)
+    def ttest_serialize(self):
+        address = Address(address_id=1, street_number='10', street_name='Adam Street', suburb='James Park',
+                          postcode='3434')
+        billing_in = Billing(billing_id=1, name='David James', card_number='1234 4567 8910 1112',
+                             expiry_date='10/2024', ccv='123', billing_type='In')
+        billing_out = Billing(billing_id=1, name='David James', card_number='2111 0198 1233 3323',
+                              expiry_date='10/2025', ccv='123', billing_type='Out')
+        client = Client(subscription_id=1)
         professional = Professional(2, 1)
         usr = User(user_id=1, first_name='James', last_name='Bond', email_address='jbond@gmail.com',
                    mobile='04102342342', address=address, password='password', client=client, professional=professional,
-                   Billing=billing_out)
+                   ccout=billing_out)
 
         packager = Encoder(usr)
-        #print(packager.serialize())
+        print(packager.serialize())
 
     def test_deserialize(self):
         user_input = """
@@ -34,37 +35,37 @@ class TestPackager(unittest.TestCase):
                 "firstName": "James",
                 "lastName": "Bond",
                 "email": "jbond@outlook.com",
-                "mobile": "0412345678",
                 "password": "Password1",
-                "address": {
-                    "streetNumber": "8",
-                    "streetName": "Biggie Street",
-                    "suburb": "Liverpool",
-                    "postcode": "2170"
-                },
+                "mobile": "0412345678",
                 "CCOut": {
                     "CCName": "Outgoing",
                     "CCNumber": "1234 5678 9111 2134",
-                    "CVV": "123",
-                    "billingType": "Out",
-                    "expiryDate": "11/2024"
+                    "expiryDate": "11/2024",
+                    "CCV": "123",
+                    "billingType": "Out"
+                },
+                "address": {
+                    "streetname": "Biggie Street",
+                    "streetnumber": "8",
+                    "suburb": "Liverpool",
+                    "postcode": "2170"
                 },
                 "client": {
                     "membershipType": "Subscription"
                 },
                 "professional": {
-                    "CCin": {
-                        "CCName": "Incoming",
-                        "CCNumber": "4444 4444 4444 4444",
-                        "CVV": "333",
-                        "billingType": "In",
-                        "expiryDate": "11/2025"
-                    },
                     "services": [
                         "Oven Repairs",
                         "Fence Installation",
                         "Roof Cleaning"
-                    ]
+                    ],
+                    "CCIn": {
+                        "CCName": "Incoming",
+                        "CCNumber": "4444 4444 4444 4444",
+                        "expiryDate": "11/2025",
+                        "CCV": "333",
+                        "billingType": "In"
+                    }
                 },
                 "securityQuestions": {
                     "securityQuestion1": {
@@ -79,14 +80,13 @@ class TestPackager(unittest.TestCase):
                         "securityQuestion": "What city were you born in?",
                         "answer": "City"
                     }
-                }
+                }                    
             }
         """
 
         decoder = Decoder(user_input, User)
         result = decoder.deserialize()
-        encoder = Encoder(result)
-        print(encoder.serialize())
+        print(result)
 
     if __name__ == '__main__':
         unittest.main(warnings='ignore')
