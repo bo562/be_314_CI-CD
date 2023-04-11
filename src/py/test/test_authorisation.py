@@ -4,7 +4,7 @@ from security.Authorisation import Authorisation
 
 class MyTestCase(unittest.TestCase):
     def test_validate_credentials(self):
-        self.assertEqual(180, Authorisation.validate_credentials('jbondthe10th@outlook.com', 'Password1'))  # add assertion here
+        self.assertEqual(180, Authorisation.validate_credentials('jbondthe10th@outlook.com', 'Password1'))
 
 
 if __name__ == '__main__':

@@ -150,9 +150,12 @@ class Database:
         self.__current_action = DatabaseAction.DELETE
         self.__query = 'DELETE FROM {} '.format(table)  # store query for database interaction
 
-    def query(self, query: str, args: tuple = (), return_id: bool = False):
+    def query(self, query: str, args: tuple = (), return_id: bool = False, action: DatabaseAction = None):
         self.__query = query
         self.__data = args
+
+        if action is not None:
+            self.__current_action = action
 
         self.__cursor = self.__database_connection.cursor()
         try:

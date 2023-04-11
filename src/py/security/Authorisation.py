@@ -10,6 +10,7 @@ from mysql.connector import Error
 
 from util.database.Database import Database
 from util.database.DatabaseLookups import DatabaseLookups
+from util.database.DatabaseAction import DatabaseAction
 from user import User
 from hashlib import sha256
 
@@ -51,7 +52,8 @@ class Authorisation:
         # using underlying query handler to save time with creating user object instead
         # if email and password match return user_id
         database.clear()
-        database.database_query("SELECT user_id FROM user WHERE email_address = %s AND password = %s")
+        database.select(('user_id',), 'user')
+        database.where('email_address = %s', email_address)
         result = database.run()
 
         # if result is empty then there is no match
