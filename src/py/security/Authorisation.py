@@ -47,7 +47,6 @@ class Authorisation:
             self.user_id = user_id
 
         # attempt to create authorisation object
-        database.clear()
         database.insert(self, 'authorisation', ('authorisation_id',))  # create query
 
         try:
@@ -79,7 +78,6 @@ class Authorisation:
             database.connect()
 
         # check if current authorisation exists
-        database.clear()
         database.select(('authorisation_id', 'refresh_token', 'number_of_uses', 'invalidated', 'user_id'),
                         'authorisation')
         database.where('user_id = %s', user_id)
@@ -107,7 +105,6 @@ class Authorisation:
 
         # using underlying query handler to save time with creating user object instead
         # if email and password match return user_id
-        database.clear()
         database.select(('user_id',), 'user')
         database.where('email_address = %s', email_address)
         database.ampersand('password = %s', password)

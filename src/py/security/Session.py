@@ -31,7 +31,6 @@ class Session:
             self.authorisation_id = authorisation_id
 
         # attempt to create authorisation object
-        database.clear()
         database.insert(self, 'session', ('session_id',))  # create query
 
         try:
