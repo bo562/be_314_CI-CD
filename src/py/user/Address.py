@@ -102,6 +102,35 @@ class Address:
         return True
 
     @staticmethod
+    def get_address(user_id: int):
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # check if database is connected, if not connect
+        if database.status is DatabaseStatus.Disconnected:
+            database.connect()
+
+        # get user object
+        database.clear()
+        database.select(('address_id', 'street_number', 'street_name', 'suburb', 'postcode'),
+                        'address')
+        database.where('user_id = %s', user_id)
+
+        # try to get authorisation
+        address = None
+        try:
+            results = database.run()
+
+        except Exception as e:
+            raise e
+
+        if len(results) > 0:
+            address = Address(address_id=results[0][0], street_number=results[0][1], street_name=results[0][2],
+                        suburb=results[0][3], postcode=results[0][4])
+
+        return address
+
+    @staticmethod
     def ToAPI(obj):
         if isinstance(obj, Address):
             remap = {

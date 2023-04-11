@@ -173,8 +173,35 @@ class User:
             raise e
 
     # return user object (possibly in json form)
-    def get_user(self, obj):
-        pass
+    @staticmethod
+    def get_user(user_id: int):
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # check if database is connected, if not connect
+        if database.status is DatabaseStatus.Disconnected:
+            database.connect()
+
+        # get user object
+        database.clear()
+        database.select(('user_id', 'first_name', 'last_name', 'email_address', 'mobile'),
+                        'user')
+        database.where('user_id = %s', user_id)
+
+        # try to get authorisation
+        user = None
+        try:
+            results = database.run()
+
+        except Exception as e:
+            raise e
+
+        if len(results) > 0:
+            user = User(user_id=results[0][0], first_name=results[0][1], last_name=results[0][2],
+                        email_address=results[0][3], mobile=results[0][4], address=Address.get_address(user_id),
+                        client=Client.get_client(user_id), professional=Professional.get_professional(user_id))
+
+        return user
 
     @staticmethod
     def validate_email(email):
@@ -221,8 +248,7 @@ class User:
                 "mobile": obj.mobile,
                 "address": obj.address,
                 "client": obj.client,
-                "professional": obj.professional,
-                "CCOut": obj.ccout
+                "professional": obj.professional
             }
             return remap
 

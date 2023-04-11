@@ -21,6 +21,24 @@ class Service:
         pass
 
     @staticmethod
+    def get_by_service_id(service_id: int):
+        # connect to database
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # create database query
+        database.clear()
+        database.select(('service_id', 'service_name', 'cost', 'retired'), 'service')
+        database.where('service_id = %s', service_id)
+
+        # run query
+        try:
+            results = database.run()
+        except Exception as e:
+            raise e
+
+        return Service(service_id=results[0][0], service_name=results[0][1], cost=results[0][2], retired=results[0][3])
+
+    @staticmethod
     def get_by_service_name(service_name) -> 'Service':
         # connect to database
         database = Database.database_handler(DatabaseLookups.User)
@@ -36,4 +54,4 @@ class Service:
         except Exception as e:
             raise e
 
-        return Service(service_id=results[0][0], service_name=results[0][1], cost=results[0][2], retired=results[0][1])
+        return Service(service_id=results[0][0], service_name=results[0][1], cost=results[0][2], retired=results[0][3])
