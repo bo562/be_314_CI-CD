@@ -37,6 +37,10 @@ class User_Controller:
         elif self.__context.get('resource-path') == '/user/validate':
             return self.validate_user()
 
+        elif self.__context.get('resource-path') == '/user/resetPassword':
+            if self.__context.get('http-method') == 'GET':
+                return self.get_user_questions()
+
     def create_user(self) -> object:
         try:
             json_body = self.__event.get('body-json')
@@ -77,3 +81,15 @@ class User_Controller:
 
     def validate_user(self) -> dict:
         return User.validate_email(self.__context.get('email_address'))
+
+
+    # for step one of resetPassword
+    def get_user_questions(self):
+        user_id = User.get_user_id(self.__context.get('email_address'))
+        user = User.get_user(user_id)
+
+        questions = []
+        for question in user.security_questions:
+            questions.append(question.ToAPI(question))
+
+        return questions

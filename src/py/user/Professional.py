@@ -180,7 +180,7 @@ class Professional:
     def ToAPI(obj):
         if isinstance(obj, Professional):
             remap = {
-                "services": obj.get_service_names(),
+                "services": obj.services,
             }
             return remap
 

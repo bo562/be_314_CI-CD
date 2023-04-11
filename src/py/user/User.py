@@ -184,8 +184,7 @@ class User:
 
         # get user object
         database.clear()
-        database.select(('user_id', 'first_name', 'last_name', 'email_address', 'mobile'),
-                        'user')
+        database.select(('user_id', 'first_name', 'last_name', 'email_address', 'mobile'), 'user')
         database.where('user_id = %s', user_id)
 
         # try to get authorisation
@@ -199,9 +198,34 @@ class User:
         if len(results) > 0:
             user = User(user_id=results[0][0], first_name=results[0][1], last_name=results[0][2],
                         email_address=results[0][3], mobile=results[0][4], address=Address.get_address(user_id),
-                        client=Client.get_client(user_id), professional=Professional.get_professional(user_id))
+                        client=Client.get_client(user_id), professional=Professional.get_professional(user_id),
+                        security_questions=User_Question.get_by_user_id(user_id))
 
         return user
+
+    # did not update get_user due to dependencies
+    @staticmethod
+    def get_user_id(email_address: str):
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # check if database is connected, if not connect
+        if database.status is DatabaseStatus.Disconnected:
+            database.connect()
+
+        # get user object
+        database.clear()
+        database.select(('user_id',), 'user')
+        database.where('email_address = %s', email_address)
+
+        # run database query
+        try:
+            results = database.run()
+
+        except Exception as e:
+            raise e
+
+        return results[0][0]
 
     @staticmethod
     def validate_email(email):
