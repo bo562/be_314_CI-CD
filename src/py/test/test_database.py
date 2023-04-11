@@ -26,11 +26,10 @@ class TestDatabase(unittest.TestCase):
 
     def test_where_select(self):
         database = Database.database_handler(DatabaseLookups.User)
-        database.clear()
 
         # select from specific table
-        database.select(('user.user_id',), 'user')
-        database.where("user_id = %s ", "1",)
+        database.select(('user_id',), 'user')
+        database.where("user_id = %s ", 1)
 
         # review query
         print(database.review_query())

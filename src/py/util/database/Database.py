@@ -90,6 +90,10 @@ class Database:
 
     # query types
     def select(self, columns: tuple, table: str):
+        # clear previous query
+        self.clear()
+
+        # set variables
         self.__table = table
         self.__current_action = DatabaseAction.SELECT
         self.__query = 'SELECT {} FROM {} '  # store query for database interaction
@@ -105,6 +109,10 @@ class Database:
         self.__query = self.__query.format(to_select, table)
 
     def insert(self, data_object: object, table: str, ignore: tuple = ()):
+        # clear previous query
+        self.clear()
+
+        # set variables
         self.__table = table
         self.__current_action = DatabaseAction.INSERT
         self.__query = 'INSERT INTO {} ({}) VALUES ({})'  # store query for database interaction
@@ -126,6 +134,10 @@ class Database:
         self.__query = self.__query.format(table, to_insert, inserting)
 
     def update(self, data_object: object, table: str, ignore: tuple = ()):
+        # clear previous query
+        self.clear()
+
+        # set variables
         self.__table = table
         self.__current_action = DatabaseAction.UPDATE
         self.__query = 'UPDATE {} SET {}'  # store query for database interaction
@@ -148,11 +160,16 @@ class Database:
         self.__query = self.__query.format(table, to_update)
 
     def delete(self, table: str):
+        # clear previous query
+        self.clear()
+
+        # set variables
         self.__table = table
         self.__current_action = DatabaseAction.DELETE
         self.__query = 'DELETE FROM {} '.format(table)  # store query for database interaction
 
     def query(self, query: str, args: tuple = (), return_id: bool = False):
+        # set variables
         self.__query = query
         self.__data = args
 
@@ -160,6 +177,7 @@ class Database:
         try:
             self.__cursor.execute(query, args)
         except Error as err:  # simple error handling
+            self.clear()
             raise err
         else:
             if return_id is True:
