@@ -12,7 +12,7 @@ import unittest
 
 
 class TestPackager(unittest.TestCase):
-    def ttest_serialize(self):
+    def test_serialize(self):
         address = Address(address_id=1, street_number='10', street_name='Adam Street', suburb='James Park',
                           postcode='3434')
         billing_in = Billing(billing_id=1, name='David James', card_number='1234 4567 8910 1112',

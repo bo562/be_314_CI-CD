@@ -214,18 +214,21 @@ class User:
             database.connect()
 
         # get user object
-        database.clear()
         database.select(('user_id',), 'user')
         database.where('email_address = %s', email_address)
 
         # run database query
         try:
-            results = database.run()
+            result = database.run()
 
         except Exception as e:
             raise e
 
-        return results[0][0]
+        if len(result) != 0:
+            return result[0][0]
+
+        else:
+            return None
 
     @staticmethod
     def validate_email(email):
@@ -271,8 +274,8 @@ class User:
                 "password": obj.password,
                 "mobile": obj.mobile,
                 "address": obj.address,
-                "client": obj.client,
-                "professional": obj.professional
+                "client": None if obj.client is None else obj.client,
+                "professional": None if obj.professional is None else obj.professional
             }
             return remap
 

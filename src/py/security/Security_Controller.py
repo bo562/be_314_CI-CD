@@ -34,6 +34,16 @@ class Security_Controller:
         if self.__context.get('resource-path') == '/user/login':
             return self.login()
 
+        elif self.__context.get('resource-path') == '/user/resetPassword':
+            if self.__context.get('http-method') == 'GET':
+                return self.get_user_questions()
+
+            elif self.__context.get('http-method') == 'POST':
+                return self.validate_user_questions()
+
+            elif self.__context.get('http-method') == 'PUT':
+                return self.update_password()
+
     def login(self):
         user_id = Authorisation.validate_credentials(self.__context.get('email_address'),
                                                      self.__context.get('password'))
@@ -70,3 +80,36 @@ class Security_Controller:
         }
 
         return to_return
+
+    def validate_user(self) -> dict:
+        return User.validate_email(self.__context.get('email_address'))
+
+    # for step one of resetPassword
+    def get_user_questions(self):
+        user_id = User.get_user_id(self.__context.get('email_address'))
+
+        if user_id is None:
+            return {
+                "statusCode": "404",
+                "error": "User does not exist"
+            }
+
+        user = User.get_user(user_id)
+
+        questions = []
+        for question in user.security_questions:
+            questions.append(question.ToAPI(question))
+
+        to_return = {
+            "statusCode": "200",
+            "user_id": user_id,
+            "questions": questions
+        }
+
+        return to_return
+
+    def validate_user_questions(self):
+        pass
+
+    def update_password(self):
+        pass

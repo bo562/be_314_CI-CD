@@ -37,7 +37,6 @@ class Decoder:
                 'expiryDate' in obj.keys() or \
                 'CCV' in obj.keys() or \
                 'billingType' in obj.keys():  # checking for CCOut field
-            print(obj)
             return Billing.FromAPI(obj)
 
         # checking for address field
