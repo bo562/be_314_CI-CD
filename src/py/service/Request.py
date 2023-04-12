@@ -16,12 +16,10 @@ class Request:
     professional_id: int = None
     service_id: int = None
 
-    def create_request(self, request_date: datetime, start_date: datetime, completion_date: datetime,
-                       instruction: str, client_id: int, professional_id: int, service_id: int):
+    def create_request(self):
         pass
 
-    def update_request(self, request_id: int, request_date: datetime, start_date: datetime, completion_date: datetime,
-                       instruction: str, client_id: int, professional_id: int, service_id: int):
+    def update_request(self):
         pass
 
     def get_request(self):

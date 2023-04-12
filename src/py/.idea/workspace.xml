@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a5225606-bd9d-48d2-a05d-2a6ffdebdba2" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/test/test_request.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/test_database.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/test_database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/database/Database.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/database/Database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/Offer.py" beforeDir="false" afterPath="$PROJECT_DIR$/service/Request_Bid.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/test_packager.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/test_packager.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -14,8 +15,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Unit Test" />
         <option value="Python Script" />
+        <option value="Python Unit Test" />
       </list>
     </option>
   </component>
