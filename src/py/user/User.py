@@ -26,7 +26,7 @@ class User:
     client: Client = None  # possibly null
     professional: Professional = None  # possibly null
     ccout: Billing = None
-    security_questions: [User_Question] = None
+    security_questions: ['User_Question'] = None
 
     # SQL query to create user in User table
     def create_user(self) -> 'User':
@@ -275,7 +275,8 @@ class User:
                 "mobile": obj.mobile,
                 "address": obj.address,
                 "client": None if obj.client is None else obj.client,
-                "professional": None if obj.professional is None else obj.professional
+                "professional": None if obj.professional is None else obj.professional,
+                "securityQuestions": obj.security_questions
             }
             return remap
 

@@ -11,6 +11,7 @@ from user.Billing import Billing
 from user.Client import Client
 from user.Professional import Professional
 from user.Subscription import Subscription
+from user.User_Question import User_Question
 
 
 class Encoder:
@@ -41,5 +42,8 @@ class Encoder:
 
         elif isinstance(obj, Professional):
             return Professional.ToAPI(obj)
+
+        elif isinstance(obj, User_Question):
+            return User_Question.ToAPI(obj)
 
         raise TypeError

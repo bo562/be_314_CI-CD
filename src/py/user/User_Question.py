@@ -154,23 +154,21 @@ class User_Question:
 
     @staticmethod
     def FromAPI(obj):
-        security_questions = []
-        for val in obj:
-            print()
-            security_question = Security_Question.get_by_answer(obj[val].get('securityQuestion'))
-            security_questions.append(User_Question(security_question_id=security_question.security_question_id,
-                                                    answer=obj[val].get('answer')))
-        return security_questions
+        security_question = Security_Question.get_by_answer(obj['securityQuestion'])
+        user_question = User_Question(security_question_id=security_question.security_question_id,
+                                      answer=obj['answer'])
+        return user_question
 
     @staticmethod
-    def ToAPI(obj):
+    def ToAPI(obj, hide_answer: bool = True):
+        print(obj)
         # get security question
         security_question = Security_Question.get_by_id(obj.security_question_id)
 
         # create return
         result = {
             "securityQuestion": security_question.question,
-            "answer": obj.answer
+            "answer": obj.answer if hide_answer is False else None  # hide answer if requried
         }
 
         return result

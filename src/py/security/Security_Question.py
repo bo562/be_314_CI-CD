@@ -18,8 +18,6 @@ class Security_Question:
         # connect to database
         database = Database.database_handler(DatabaseLookups.User)
 
-        print(question)
-
         # create database query
         database.clear()
         database.select(('security_question_id', 'question', 'retired'), 'security_question')
@@ -30,7 +28,7 @@ class Security_Question:
             results = database.run()
         except Exception as e:
             raise e
-        print(results)
+
         return Security_Question(security_question_id=results[0][0], question=results[0][1], retired=results[0][2])
 
     @staticmethod

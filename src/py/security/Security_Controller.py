@@ -35,6 +35,7 @@ class Security_Controller:
             return self.login()
 
         elif self.__context.get('resource-path') == '/user/resetPassword':
+            # handle different methods triggered at endpoint
             if self.__context.get('http-method') == 'GET':
                 return self.get_user_questions()
 
@@ -45,20 +46,24 @@ class Security_Controller:
                 return self.update_password()
 
     def login(self):
+        # use prebuilt function to handle validation and return user_id
         user_id = Authorisation.validate_credentials(self.__context.get('email_address'),
                                                      self.__context.get('password'))
 
-        # check if login worked
-        if user_id is None: return {"statusCode": "Email or Password Incorrect"}
+        # check if validation returned user
+        if user_id is None:
+            return {
+                "statusCode": "404",
+                "error": "Email or Password Incorrect"
+            }
 
-        # check for authorisation that is not invalided else create a new authorsation
-        authorisation = Authorisation()
-        authorisation = authorisation.get_authorisation(user_id=user_id)
-
-        # if no authorisation was found for user
-        if authorisation is None:
-            authorisation = Authorisation(refresh_token=Authorisation.generate_refresh_token(user_id=user_id))
-            authorisation = authorisation.create_authorisation(user_id=user_id)
+        # check for authorisation that is not invalided else create a new authorisation
+        authorisation = None
+        with Authorisation.get_authorisation(user_id) as authorisation:
+            # if no authorisation was found for user
+            if authorisation.get_authorisation(user_id=user_id) is None:
+                authorisation = Authorisation(refresh_token=Authorisation.generate_refresh_token(user_id=user_id))
+                authorisation = authorisation.create_authorisation(user_id=user_id)
 
         # generate session for user
         expiry_date = datetime.now() + timedelta(days=1)
@@ -73,6 +78,7 @@ class Security_Controller:
         encoded = Encoder(user).serialize()
 
         to_return = {
+            "statusCode": "200",
             "access_token": session.access_token,
             "refresh_token": authorisation.refresh_token,
             "expiry": session.expiry_date.__str__(),
@@ -91,7 +97,7 @@ class Security_Controller:
         if user_id is None:
             return {
                 "statusCode": "404",
-                "error": "User does not exist"
+                "error": "User not found"
             }
 
         user = User.get_user(user_id)

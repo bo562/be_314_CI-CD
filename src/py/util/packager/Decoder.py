@@ -53,9 +53,7 @@ class Decoder:
                 'services' in obj.keys():  # checking for professional field
             return Professional.FromAPI(obj)
 
-        elif 'securityQuestion1' in obj.keys() or \
-                'securityQuestion2' in obj.keys() or \
-                'securityQuestion3' in obj.keys():  # checking for security question field
+        elif 'securityQuestion' in obj.keys():
             return User_Question.FromAPI(obj)
 
         else:

@@ -5,6 +5,7 @@ The controller should mimic the functionality of expected output of Lambda funct
 """
 
 import json
+import traceback
 from user.User import User
 from util.packager.Decoder import Decoder
 from util.packager.Encoder import Encoder

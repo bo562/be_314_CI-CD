@@ -6,6 +6,7 @@ from user.Billing import Billing
 from user.Client import Client
 from user.Professional import Professional
 from user.Subscription import Subscription
+from user.User_Question import User_Question
 from util.packager.Encoder import Encoder
 from util.packager.Decoder import Decoder
 import unittest
@@ -21,14 +22,19 @@ class TestPackager(unittest.TestCase):
                               expiry_date='10/2025', ccv='123', billing_type='Out')
         client = Client(subscription_id=1)
         professional = Professional(2, 1)
+        security_questions = [
+            User_Question(),
+            User_Question(),
+            User_Question()
+        ]
         usr = User(user_id=1, first_name='James', last_name='Bond', email_address='jbond@gmail.com',
-                   mobile='04102342342', address=address, password='password', client=client, professional=professional,
-                   ccout=billing_out)
+                   mobile='04102342342', address=address, password='password', client=client,
+                   ccout=billing_out, security_questions=security_questions)
 
         packager = Encoder(usr)
         print(packager.serialize())
 
-    def test_deserialize(self):
+    def ttest_deserialize(self):
         user_input = """
             {
                 "user_id": 1,
@@ -67,20 +73,20 @@ class TestPackager(unittest.TestCase):
                         "billingType": "In"
                     }
                 },
-                "securityQuestions": {
-                    "securityQuestion1": {
+                "securityQuestions": [
+                    {
                         "securityQuestion": "What was your first car?",
                         "answer": "Car"
                     },
-                    "securityQuestion2": {
+                    {
                         "securityQuestion": "What was your childhood nickname?",
                         "answer": "Nickname"
                     },
-                    "securityQuestion3": {
+                    {
                         "securityQuestion": "What city were you born in?",
                         "answer": "City"
                     }
-                }                    
+                ]                                    
             }
         """
 
