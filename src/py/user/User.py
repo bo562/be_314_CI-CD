@@ -140,7 +140,7 @@ class User:
         # commit and close database connection
         database.disconnect()
 
-        return self
+        return self.get_user(self.user_id)
 
     # delete entire user object
     def delete_user(self) -> None:

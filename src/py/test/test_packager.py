@@ -35,7 +35,7 @@ class TestPackager(unittest.TestCase):
         packager = Encoder(usr)
         print(packager.serialize())
 
-    def ttest_deserialize(self):
+    def test_deserialize(self):
         user_input = """
             {
                 "user_id": 1,
