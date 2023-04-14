@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 
 
 class Security_Controller:
-    __event: str  # actual data sent from api gateway
+    __event: dict  # actual data sent from api gateway
     __context = None
 
     def __init__(self, event: str):
@@ -45,6 +45,15 @@ class Security_Controller:
             elif self.__context.get('http-method') == 'PUT':
                 return self.update_password()
 
+        elif self.__event.get('type') is not None:
+            return self.__event
+
+        else:
+            return {
+                "statusCode": "403",
+                "message": "No existing endpoint {}".format(self.__event.get('resource-path'))
+            }
+
     def login(self):
         # use prebuilt function to handle validation and return user_id
         user_id = Authorisation.validate_credentials(self.__context.get('email_address'),
@@ -54,7 +63,7 @@ class Security_Controller:
         if user_id is None:
             return {
                 "statusCode": "404",
-                "error": "Email or Password Incorrect"
+                "message": "Email or Password Incorrect"
             }
 
         # check for authorisation that is not invalided else create a new authorisation
@@ -75,8 +84,8 @@ class Security_Controller:
         # get user
         user = User.get_user(user_id=user_id)
 
+        # serialize json to deserialze in dict for AWS Stringify
         encoded = Encoder(user).serialize()
-
         to_return = {
             "statusCode": "200",
             "access_token": session.access_token,
@@ -87,22 +96,40 @@ class Security_Controller:
 
         return to_return
 
+    # to authorize actions on protected endpoints
+    def Authorize_Event(self):
+        session_id = Session.validate_session(self.__event.get('authorizationToken'))
+
+        if session_id is None:
+            return {
+                "statusCode": "403",
+                "message": "Unauthorized"
+            }
+
+        else:
+            return {
+                "statusCode": "202",
+                "message": "Token Accepted"
+            }
+
     # for step one of resetPassword
     def get_user_questions(self):
         user_id = User.get_user_id(self.__context.get('email_address'))
 
+        # check if user was returned from validation
         if user_id is None:
             return {
                 "statusCode": "404",
-                "error": "User not found"
+                "message": "User not found"
             }
 
+        # create user object and iterate through questions
         user = User.get_user(user_id)
-
         questions = []
         for question in user.security_questions:
-            questions.append(question.ToAPI(question))
+            questions.append(question.ToAPI(question))  # utilising already created ToAPI Method
 
+        # return information
         to_return = {
             "statusCode": "200",
             "user_id": user_id,

@@ -22,8 +22,12 @@ class TestPackager(unittest.TestCase):
         billing_out = Billing(billing_id=1, name='David James', card_number='2111 0198 1233 3323',
                               expiry_date='10/2025', ccv='123', billing_type='Out')
         client = Client(subscription_id=1)
+        services = [
+            Service(service_id=1, service_name='Tree Removal'),
+            Service(service_id=2, service_name='Oven Repairs')
+        ]
         professional = Professional(user_id=1, professional_id=2, subscription_id=1,
-                                    services=[Service(service_id=1, service_name='Tree Removal')], CCin=billing_in)
+                                    services=services, CCin=billing_in)
         security_questions = [
             User_Question(user_question_id=None, user_id=147, answer="Cat", security_question_id=1),
             User_Question(user_question_id=None, user_id=147, answer="Cat", security_question_id=1)

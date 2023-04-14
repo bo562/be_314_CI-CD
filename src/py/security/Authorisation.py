@@ -24,6 +24,12 @@ class Authorisation:
     invalidated: str = 'N'
     user_id: int = None
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
     @staticmethod
     def generate_refresh_token(user_id: int):
         to_hash = str(user_id) + datetime.datetime.now().strftime("%d/%m/%YT%H:%M:%S")

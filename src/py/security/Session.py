@@ -3,6 +3,7 @@ py that describes the session object, with supporting functions
 """
 from dataclasses import dataclass
 from hashlib import sha256
+from datetime import datetime
 from util.database.Database import Database
 from util.database.DatabaseLookups import DatabaseLookups
 from util.database.DatabaseStatus import DatabaseStatus
@@ -13,7 +14,7 @@ from mysql.connector import errors
 class Session:
     session_id: int = None
     access_token: str = None
-    expiry_date: str = None
+    expiry_date: datetime = None
     authorisation_id: int = None
 
     def create_session(self, authorisation_id: int):
@@ -41,6 +42,37 @@ class Session:
             return None
 
         return self
+
+    # method that returns whether or not a access_token is valid
+    @staticmethod
+    def validate_session(access_token: str) -> bool:
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # check if database connected
+        if database.status == DatabaseStatus.Disconnected:
+            database.connect()
+
+        # check whether the session is invalidated
+        database.select(('session_id',), 'session')
+        database.where('access_token = %s', access_token)
+        database.where('expiry_date > %s', datetime.now())
+
+        # try running the query
+        try:
+            results = database.run()
+
+        except Exception as e:
+            raise e
+
+        # check if session_id is returned based on expiry date
+        if results[0][0] is None:
+            return True
+
+        else:
+            return False
+
+
 
     @staticmethod
     def generate_access_token(refresh_token: str):
