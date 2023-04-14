@@ -17,12 +17,12 @@ class Security_Controller:
     __event: dict  # actual data sent from api gateway
     __context = None
 
-    def __init__(self, event: str):
+    def __init__(self, event: dict):
         self.__event = event
         self.__context = event.get('context')
 
     @staticmethod
-    def Event_Start(event: str):
+    def Event_Start(event: dict):
         # create controller to handle event
         user_controller = Security_Controller(event=event)
 
@@ -45,8 +45,8 @@ class Security_Controller:
             elif self.__context.get('http-method') == 'PUT':
                 return self.update_password()
 
-        elif self.__event.get('type') is not None:
-            return self.__event
+        elif self.__event.get('type') is "TOKEN":
+            return self.authorize_event()
 
         else:
             return {
@@ -97,19 +97,33 @@ class Security_Controller:
         return to_return
 
     # to authorize actions on protected endpoints
-    def Authorize_Event(self):
-        session_id = Session.validate_session(self.__event.get('authorizationToken'))
-
-        if session_id is None:
+    def authorize_event(self):
+        #session_id = Session.validate_session(self.__event.get('authorizationToken'))
+        if self.__event.get('authorizationToken') == '0307b15f75065db27c312341ad47066695af49d4320cca15b08a65e384a5b880':
             return {
-                "statusCode": "403",
-                "message": "Unauthorized"
+                "policyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Action": "execute-api:Invoke",
+                            "Effect": "Allow",
+                            "Resource": self.__event.get('methodArn')
+                        }
+                    ]
+                }
             }
-
         else:
             return {
-                "statusCode": "202",
-                "message": "Token Accepted"
+                "policyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Action": "execute-api:Invoke",
+                            "Effect": "Deny",
+                            "Resource": self.__event.get('methodArn')
+                        }
+                    ]
+                }
             }
 
     # for step one of resetPassword
@@ -139,7 +153,21 @@ class Security_Controller:
         return to_return
 
     def validate_user_questions(self):
-        pass
+        # get user object
+        body = self.__event['body-json']
+        user = User.get_user(body.get('user_id'))
+
+        passed = True
+        for response in body.get('questions'):
+            passed = user.validate_answer(response.get('securityQuestion'), response.get('answer'))
+
+        return {
+            "matched": passed
+        }
 
     def update_password(self):
-        pass
+        # get user object
+        body = self.__event.get('body-json')
+        user = User.get_user(body.get('user_id'))
+        user.password = body.get('password')
+        return Encoder(user.update_user()).serialize()

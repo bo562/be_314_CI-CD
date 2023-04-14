@@ -3,6 +3,7 @@ Class file for user data type
 """
 from dataclasses import dataclass
 from mysql.connector import errors
+from security.Security_Question import Security_Question
 from user.User_Question import User_Question
 from user.Address import Address
 from user.Client import Client
@@ -44,18 +45,8 @@ class User:
             database.commit()
 
         except errors.IntegrityError as ie:  # in case that user already exists
-            if ie.errno == 1452:  # cannot solve gracefully
-                database.disconnect()
-                raise Exception(f'User Already Exists')
-
-            # constructing query to return already created user
             database.clear()
-            database.select(('user_id',), 'user')
-            database.where('email_address = %s', self.email_address)
-
-            # run query and return user_id
-            self.user_id = database.run()[0][0]
-            return self
+            raise Exception(f'User Already Exists')
 
         # add nested classes
         self.ccout = self.ccout.create_billing(self.user_id)
@@ -170,6 +161,18 @@ class User:
         except Exception as e:
             raise e
 
+    # validate user_question
+    def validate_answer(self, question: str, answer) -> bool:
+        # iterate through user questions and check if an answer does not match
+        passed = True
+        for user_question in self.security_questions:
+            if Security_Question.get_by_id(user_question.security_question_id).question == question:
+                if answer != user_question.answer:
+                    passed = False
+                    break
+
+        return passed
+
     # return user object (possibly in json form)
     @staticmethod
     def get_user(user_id: int):
@@ -181,7 +184,7 @@ class User:
             database.connect()
 
         # get user object
-        database.select(('user_id', 'first_name', 'last_name', 'email_address', 'mobile'), 'user')
+        database.select(('user_id', 'first_name', 'last_name', 'email_address', 'mobile', 'password'), 'user')
         database.where('user_id = %s', user_id)
 
         # try to get authorisation
@@ -194,7 +197,7 @@ class User:
 
         if len(results) > 0:
             user = User(user_id=results[0][0], first_name=results[0][1], last_name=results[0][2],
-                        email_address=results[0][3], mobile=results[0][4], address=Address.get_address(user_id),
+                        email_address=results[0][3], mobile=results[0][4], password=results[0][5], address=Address.get_address(user_id),
                         client=Client.get_client(user_id), professional=Professional.get_professional(user_id),
                         security_questions=User_Question.get_by_user_id(user_id))
 
