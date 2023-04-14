@@ -87,9 +87,6 @@ class Security_Controller:
 
         return to_return
 
-    def validate_user(self) -> dict:
-        return User.validate_email(self.__context.get('email_address'))
-
     # for step one of resetPassword
     def get_user_questions(self):
         user_id = User.get_user_id(self.__context.get('email_address'))

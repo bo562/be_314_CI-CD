@@ -37,7 +37,6 @@ class User:
             database.connect()
 
         # attempt to create base user
-        database.clear()
         database.insert(self, 'user', ('user_id', 'address', 'ccout', 'client', 'professional', 'security_questions'))
 
         try:
@@ -59,7 +58,6 @@ class User:
             return self
 
         # add nested classes
-        database.clear()
         self.ccout = self.ccout.create_billing(self.user_id)
 
         # check if creation was successful
@@ -101,7 +99,7 @@ class User:
         # commit and close database connection
         database.disconnect()
 
-        return self
+        return self.get_user(self.user_id)
 
     def update_user(self):
         database = Database.database_handler(DatabaseLookups.User)  # create database instance
@@ -183,7 +181,6 @@ class User:
             database.connect()
 
         # get user object
-        database.clear()
         database.select(('user_id', 'first_name', 'last_name', 'email_address', 'mobile'), 'user')
         database.where('user_id = %s', user_id)
 

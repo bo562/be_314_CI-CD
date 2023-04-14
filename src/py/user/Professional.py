@@ -189,12 +189,12 @@ class Professional:
     @staticmethod
     def FromAPI(obj):
         # get subscription_id from 'Subscription' value (could change ids in the future)
-        subscription_name = 'Subscription'
+        subscription_name = 'Subscription'  # always subscription
         database = Database.database_handler(DatabaseLookups.User)
-        database.clear()
         database.select(('subscription_id',), 'subscription')
         database.where('subscription_name = %s', subscription_name)
         results = database.run()
+
         subscription_id = results[0][0] if results is not None else None
 
         return Professional(services=obj.get('services'), CCin=obj.get('CCIn'), subscription_id=subscription_id)

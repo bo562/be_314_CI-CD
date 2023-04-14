@@ -75,3 +75,6 @@ class User_Controller:
 
         except Exception as e:
             raise e
+
+    def validate_user(self) -> dict:
+        return User.validate_email(self.__context.get('email_address'))
