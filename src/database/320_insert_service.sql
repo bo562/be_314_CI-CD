@@ -1,17 +1,11 @@
-INSERT INTO service (service_name,  cost, retired) values ('Lawn mowing', 120, null);
+INSERT INTO service (service_name) values ('Tree Removal');
 
-INSERT INTO service (service_name,  cost, retired) values ('Weeding', 130, null);
+INSERT INTO service (service_name) values ('Roof Cleaning');
 
-INSERT INTO service (service_name,  cost, retired) values ('Mulching', 150, null);
+INSERT INTO service (service_name) values ('Fence Installation');
 
-INSERT INTO service (service_name,  cost, retired) values ('Plumbing Repair', 220, null);
+INSERT INTO service (service_name) values ('Plumbing');
 
-INSERT INTO service (service_name,  cost, retired) values ('Electrical Repair', 250, null);
+INSERT INTO service (service_name) values ('Oven Repairs');
 
-INSERT INTO service (service_name,  cost, retired) values ('Whitegoods Installation', 110, null);
-
-INSERT INTO service (service_name,  cost, retired) values ('Locks changed', 170, null);
-
-INSERT INTO service (service_name,  cost, retired) values ('Cleaning', 190, null);
-
-commit;
+COMMIT;

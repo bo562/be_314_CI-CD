@@ -1,11 +1,10 @@
 CREATE TABLE address (
      address_id         MEDIUMINT NOT NULL AUTO_INCREMENT,
      user_id            MEDIUMINT NOT NULL,
-     street_number      CHAR(100) NOT NULL,
-     street_name        CHAR(100) NOT NULL,
-     suburb             CHAR(100) NOT NULL,
+     street_number      VARCHAR(50) NOT NULL,
+     street_name        VARCHAR(200) NOT NULL,
+     suburb             VARCHAR(50) NOT NULL,
      postcode           INT NOT NULL,
-     state              CHAR(10) NOT NULL,
      PRIMARY KEY (address_id),
      FOREIGN KEY (user_id) REFERENCES user(user_id)
 );

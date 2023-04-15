@@ -1,7 +1,7 @@
-INSERT INTO bid_status (status_name) values (1, 'Approved');
+INSERT INTO bid_status (status_name) values ('Active');
 
-INSERT INTO bid_status (status_name) values ('Declined');
+INSERT INTO bid_status (status_name) values ('Accepted');
 
-INSERT INTO bid_status (status_name) values (3, 'Pending');
+INSERT INTO bid_status (status_name) values ('Rejected');
 
 COMMIT;

@@ -1,7 +1,7 @@
 CREATE TABLE user_question (
      user_question_id     MEDIUMINT NOT NULL AUTO_INCREMENT,
      user_id              MEDIUMINT NOT NULL,
-     security_question_id MEDIUMINT NOT NULL,
+     security_question_id INT NOT NULL,
      answer               VARCHAR(2000) NOT NULL,
      PRIMARY KEY (user_question_id),
      FOREIGN KEY (security_question_id) REFERENCES security_question(security_question_id),

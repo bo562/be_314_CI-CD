@@ -1,7 +1,7 @@
 -- ToDo: rename table to provided_service
 CREATE TABLE associated_service (
      provided_service_id MEDIUMINT NOT NULL AUTO_INCREMENT,
-     service_id          MEDIUMINT NOT NULL,
+     service_id          INT NOT NULL,
      professional_id     MEDIUMINT NOT NULL,
      PRIMARY KEY (provided_service_id),
      FOREIGN KEY (service_id) REFERENCES service(service_id),

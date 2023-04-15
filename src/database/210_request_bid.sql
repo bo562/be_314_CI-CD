@@ -5,7 +5,7 @@ CREATE TABLE request_bid (
      sent_date                    DATETIME NOT NULL,
      accepted_by_client_date      DATETIME,
      professional_cancelled_date  DATETIME,     
-     bid_status_id                MEDIUMINT NOT NULL,
+     bid_status_id                INT NOT NULL,
      PRIMARY KEY (request_bid_id),
      FOREIGN KEY (professional_id) REFERENCES professional(professional_id),
      FOREIGN KEY (request_id) REFERENCES request(request_id),
