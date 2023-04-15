@@ -90,7 +90,7 @@ class Authorisation:
         database.ampersand('invalidated = %s', 'N')
 
         # try to get authorisation
-        authorisation = None
+
         try:
             results = database.run()
 
@@ -101,6 +101,8 @@ class Authorisation:
             authorisation = Authorisation(authorisation_id=results[0][0], refresh_token=results[0][1],
                                           number_of_uses=results[0][1], invalidated=results[0][2],
                                           user_id=results[0][1])
+        else:
+            authorisation = None
 
         return authorisation
 

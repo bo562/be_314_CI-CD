@@ -46,6 +46,7 @@ class User:
 
         except errors.IntegrityError as ie:  # in case that user already exists
             database.clear()
+            print(ie)
             raise Exception(f'User Already Exists')
 
         # add nested classes

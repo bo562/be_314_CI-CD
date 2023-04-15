@@ -67,12 +67,11 @@ class Security_Controller:
             }
 
         # check for authorisation that is not invalided else create a new authorisation
-        authorisation = None
-        with Authorisation.get_authorisation(user_id) as authorisation:
-            # if no authorisation was found for user
-            if authorisation.get_authorisation(user_id=user_id) is None:
-                authorisation = Authorisation(refresh_token=Authorisation.generate_refresh_token(user_id=user_id))
-                authorisation = authorisation.create_authorisation(user_id=user_id)
+        authorisation = Authorisation.get_authorisation(user_id)
+        # if no authorisation was found for user
+        if authorisation is None:
+            authorisation = Authorisation(refresh_token=Authorisation.generate_refresh_token(user_id=user_id))
+            authorisation = authorisation.create_authorisation(user_id=user_id)
 
         # generate session for user
         expiry_date = datetime.now() + timedelta(days=1)
