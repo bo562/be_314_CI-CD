@@ -38,16 +38,18 @@ class Database:
     @staticmethod
     def database_handler(secret_name):
         # retrieve secret from aws
+        """ # issues with aws
         try:
             secret = Database.get_secret(secret_name)
             mysql_info = json.loads(secret)
         except Exception as e:
             raise e
+        """
 
         # attempt database connection
         try:
-            database = Database(mysql_info['host'], mysql_info['database'],
-                                mysql_info['username'], mysql_info['password'])
+            database = Database('csit314-gp.crjrzvrrbory.us-east-1.rds.amazonaws.com', 'Project',
+                                'user_lambda', 'uDb+J5Jr7vV)ek>')
         except Error as err:
             raise err
 
@@ -88,6 +90,10 @@ class Database:
 
     # query types
     def select(self, columns: tuple, table: str):
+        # clear previous query
+        self.clear()
+
+        # set variables
         self.__table = table
         self.__current_action = DatabaseAction.SELECT
         self.__query = 'SELECT {} FROM {} '  # store query for database interaction
@@ -103,6 +109,10 @@ class Database:
         self.__query = self.__query.format(to_select, table)
 
     def insert(self, data_object: object, table: str, ignore: tuple = ()):
+        # clear previous query
+        self.clear()
+
+        # set variables
         self.__table = table
         self.__current_action = DatabaseAction.INSERT
         self.__query = 'INSERT INTO {} ({}) VALUES ({})'  # store query for database interaction
@@ -124,6 +134,10 @@ class Database:
         self.__query = self.__query.format(table, to_insert, inserting)
 
     def update(self, data_object: object, table: str, ignore: tuple = ()):
+        # clear previous query
+        self.clear()
+
+        # set variables
         self.__table = table
         self.__current_action = DatabaseAction.UPDATE
         self.__query = 'UPDATE {} SET {}'  # store query for database interaction
@@ -146,11 +160,16 @@ class Database:
         self.__query = self.__query.format(table, to_update)
 
     def delete(self, table: str):
+        # clear previous query
+        self.clear()
+
+        # set variables
         self.__table = table
         self.__current_action = DatabaseAction.DELETE
         self.__query = 'DELETE FROM {} '.format(table)  # store query for database interaction
 
     def query(self, query: str, args: tuple = (), return_id: bool = False):
+        # set variables
         self.__query = query
         self.__data = args
 
@@ -158,6 +177,7 @@ class Database:
         try:
             self.__cursor.execute(query, args)
         except Error as err:  # simple error handling
+            self.clear()
             raise err
         else:
             if return_id is True:
@@ -167,7 +187,15 @@ class Database:
 
     # query augmenting
     def where(self, clause: str, value: str):
-        self.__query += "WHERE " + clause + " "  # extra space for adding more query
+        self.__query += "WHERE " + clause + " "  # extra space for adding more queries
+        self.__data.append(value)
+
+    def ampersand(self, clause: str, value: str):
+        self.__query += 'AND ' + clause + ' '  # extra space for adding more queries
+        self.__data.append(value)
+
+    def bar(self, clause: str, value: str):
+        self.__query += 'OR ' + clause + ' '  # extra space for adding more queries
         self.__data.append(value)
 
     # query actions
@@ -200,7 +228,6 @@ class Database:
             # all other queries should return row id
             else:
                 result = self.query(self.__query, self.__data, return_id=True)
-                self.commit()
                 return result
 
         except Error as err:  # simple error handling if works return true otherwise return false
@@ -211,8 +238,8 @@ class Database:
 
     def clear(self):
         self.__table: str = None
-        self.__columns = []
-        self.__data = []
+        self.__columns.clear()
+        self.__data.clear()
         self.__query: str = ""
 
         # close cursor
