@@ -165,11 +165,11 @@ class User:
     # validate user_question
     def validate_answer(self, question: str, answer) -> bool:
         # iterate through user questions and check if an answer does not match
-        passed = True
+        passed = False
         for user_question in self.security_questions:
             if Security_Question.get_by_id(user_question.security_question_id).question == question:
-                if answer != user_question.answer:
-                    passed = False
+                if answer == user_question.answer:
+                    passed = True
                     break
 
         return passed
@@ -198,8 +198,9 @@ class User:
 
         if len(results) > 0:
             user = User(user_id=results[0][0], first_name=results[0][1], last_name=results[0][2],
-                        email_address=results[0][3], mobile=results[0][4], password=results[0][5], address=Address.get_address(user_id),
-                        client=Client.get_client(user_id), professional=Professional.get_professional(user_id),
+                        email_address=results[0][3], mobile=results[0][4], password=results[0][5],
+                        address=Address.get_address(user_id), client=Client.get_client(user_id),
+                        professional=Professional.get_professional(user_id),
                         security_questions=User_Question.get_by_user_id(user_id))
 
         return user

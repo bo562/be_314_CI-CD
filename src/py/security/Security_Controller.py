@@ -156,9 +156,12 @@ class Security_Controller:
         body = self.__event['body-json']
         user = User.get_user(body.get('user_id'))
 
-        passed = True
+        count = 0
         for response in body.get('questions'):
-            passed = user.validate_answer(response.get('securityQuestion'), response.get('answer'))
+            if user.validate_answer(response.get('securityQuestion'), response.get('answer')) is True:
+                count += 1
+
+        passed = True if count == 3 else False
 
         return {
             "matched": passed
