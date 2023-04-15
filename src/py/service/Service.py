@@ -11,7 +11,6 @@ from util.database.DatabaseLookups import DatabaseLookups
 class Service:
     service_id: int
     service_name: str = None
-    cost: float = None
     retired: datetime = None
 
     def create_service(self, service_name: str, cost: float, retired: datetime):
@@ -27,7 +26,7 @@ class Service:
 
         # create database query
         database.clear()
-        database.select(('service_id', 'service_name', 'cost', 'retired'), 'service')
+        database.select(('service_id', 'service_name', 'retired'), 'service')
         database.where('service_id = %s', service_id)
 
         # run query
@@ -36,7 +35,7 @@ class Service:
         except Exception as e:
             raise e
 
-        return Service(service_id=results[0][0], service_name=results[0][1], cost=results[0][2], retired=results[0][3])
+        return Service(service_id=results[0][0], service_name=results[0][1], retired=results[0][2])
 
     @staticmethod
     def get_by_service_name(service_name) -> 'Service':
@@ -45,7 +44,7 @@ class Service:
 
         # create database query
         database.clear()
-        database.select(('service_id', 'service_name', 'cost', 'retired'), 'service')
+        database.select(('service_id', 'service_name', 'retired'), 'service')
         database.where('service_name = %s', service_name)
 
         # run query
@@ -54,4 +53,4 @@ class Service:
         except Exception as e:
             raise e
 
-        return Service(service_id=results[0][0], service_name=results[0][1], cost=results[0][2], retired=results[0][3])
+        return Service(service_id=results[0][0], service_name=results[0][1], retired=results[0][2])
