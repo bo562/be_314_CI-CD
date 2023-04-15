@@ -231,10 +231,14 @@ class Database:
                 return result
 
         except Error as err:  # simple error handling if works return true otherwise return false
+            self.rollback()
             raise err
 
     def commit(self):
         self.__database_connection.commit()
+
+    def rollback(self):
+        self.__database_connection.rollback()
 
     def clear(self):
         self.__table: str = None
