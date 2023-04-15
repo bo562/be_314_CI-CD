@@ -5,13 +5,14 @@ The controller should mimic the functionality of expected output of Lambda funct
 """
 
 import json
+import traceback
 from user.User import User
 from util.packager.Decoder import Decoder
 from util.packager.Encoder import Encoder
 
 
 class User_Controller:
-    __event: str  # actual data sent from api gateway
+    __event: dict  # actual data sent from api gateway
     __context = None
 
     def __init__(self, event: str):
@@ -40,10 +41,11 @@ class User_Controller:
     def create_user(self) -> object:
         try:
             json_body = self.__event.get('body-json')
-            usr = Decoder(json.dumps(json_body), 'User').deserialize()
+            usr = Decoder(json.dumps(json_body), User).deserialize()
             new_user = usr.create_user()
 
         except Exception as e:
+            raise e
             return {
                 "statusCode": "500",
                 "error": e.args
@@ -62,7 +64,7 @@ class User_Controller:
     def update_user(self) -> User:
         try:
             json_body = self.__event.get('body-json')
-            usr = Decoder(json.dumps(json_body), 'User').deserialize()
+            usr = Decoder(json.dumps(json_body), User).deserialize()
             updated_user = usr.update_user()
 
         except Exception as e:

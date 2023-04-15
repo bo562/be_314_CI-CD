@@ -3,6 +3,7 @@ Class file for user data type
 """
 from dataclasses import dataclass
 from mysql.connector import errors
+from security.Security_Question import Security_Question
 from user.User_Question import User_Question
 from user.Address import Address
 from user.Client import Client
@@ -26,7 +27,7 @@ class User:
     client: Client = None  # possibly null
     professional: Professional = None  # possibly null
     ccout: Billing = None
-    security_questions: [User_Question] = None
+    security_questions: ['User_Question'] = None
 
     # SQL query to create user in User table
     def create_user(self) -> 'User':
@@ -37,7 +38,6 @@ class User:
             database.connect()
 
         # attempt to create base user
-        database.clear()
         database.insert(self, 'user', ('user_id', 'address', 'ccout', 'client', 'professional', 'security_questions'))
 
         try:
@@ -45,21 +45,11 @@ class User:
             database.commit()
 
         except errors.IntegrityError as ie:  # in case that user already exists
-            if ie.errno == 1452:  # cannot solve gracefully
-                database.disconnect()
-                raise Exception(f'User Already Exists')
-
-            # constructing query to return already created user
             database.clear()
-            database.select(('user_id',), 'user')
-            database.where('email_address = %s', self.email_address)
-
-            # run query and return user_id
-            self.user_id = database.run()[0][0]
-            return self
+            print(ie)
+            raise Exception(f'User Already Exists')
 
         # add nested classes
-        database.clear()
         self.ccout = self.ccout.create_billing(self.user_id)
 
         # check if creation was successful
@@ -101,7 +91,7 @@ class User:
         # commit and close database connection
         database.disconnect()
 
-        return self
+        return self.get_user(self.user_id)
 
     def update_user(self):
         database = Database.database_handler(DatabaseLookups.User)  # create database instance
@@ -142,7 +132,7 @@ class User:
         # commit and close database connection
         database.disconnect()
 
-        return self
+        return self.get_user(self.user_id)
 
     # delete entire user object
     def delete_user(self) -> None:
@@ -172,9 +162,75 @@ class User:
         except Exception as e:
             raise e
 
+    # validate user_question
+    def validate_answer(self, question: str, answer) -> bool:
+        # iterate through user questions and check if an answer does not match
+        passed = False
+        for user_question in self.security_questions:
+            if Security_Question.get_by_id(user_question.security_question_id).question == question:
+                if answer == user_question.answer:
+                    passed = True
+                    break
+
+        return passed
+
     # return user object (possibly in json form)
-    def get_user(self, obj):
-        pass
+    @staticmethod
+    def get_user(user_id: int):
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # check if database is connected, if not connect
+        if database.status is DatabaseStatus.Disconnected:
+            database.connect()
+
+        # get user object
+        database.select(('user_id', 'first_name', 'last_name', 'email_address', 'mobile', 'password'), 'user')
+        database.where('user_id = %s', user_id)
+
+        # try to get authorisation
+        user = None
+        try:
+            results = database.run()
+
+        except Exception as e:
+            raise e
+
+        if len(results) > 0:
+            user = User(user_id=results[0][0], first_name=results[0][1], last_name=results[0][2],
+                        email_address=results[0][3], mobile=results[0][4], password=results[0][5],
+                        address=Address.get_address(user_id), client=Client.get_client(user_id),
+                        professional=Professional.get_professional(user_id),
+                        security_questions=User_Question.get_by_user_id(user_id))
+
+        return user
+
+    # did not update get_user due to dependencies
+    @staticmethod
+    def get_user_id(email_address: str):
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # check if database is connected, if not connect
+        if database.status is DatabaseStatus.Disconnected:
+            database.connect()
+
+        # get user object
+        database.select(('user_id',), 'user')
+        database.where('email_address = %s', email_address)
+
+        # run database query
+        try:
+            result = database.run()
+
+        except Exception as e:
+            raise e
+
+        if len(result) != 0:
+            return result[0][0]
+
+        else:
+            return None
 
     @staticmethod
     def validate_email(email):
@@ -220,9 +276,9 @@ class User:
                 "password": obj.password,
                 "mobile": obj.mobile,
                 "address": obj.address,
-                "client": obj.client,
-                "professional": obj.professional,
-                "CCOut": obj.ccout
+                "client": None if obj.client is None else obj.client,
+                "professional": None if obj.professional is None else obj.professional,
+                "securityQuestions": obj.security_questions
             }
             return remap
 

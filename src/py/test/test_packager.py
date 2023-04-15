@@ -6,13 +6,15 @@ from user.Billing import Billing
 from user.Client import Client
 from user.Professional import Professional
 from user.Subscription import Subscription
+from user.User_Question import User_Question
+from service.Service import Service
 from util.packager.Encoder import Encoder
 from util.packager.Decoder import Decoder
 import unittest
 
 
 class TestPackager(unittest.TestCase):
-    def ttest_serialize(self):
+    def test_serialize(self):
         address = Address(address_id=1, street_number='10', street_name='Adam Street', suburb='James Park',
                           postcode='3434')
         billing_in = Billing(billing_id=1, name='David James', card_number='1234 4567 8910 1112',
@@ -20,10 +22,19 @@ class TestPackager(unittest.TestCase):
         billing_out = Billing(billing_id=1, name='David James', card_number='2111 0198 1233 3323',
                               expiry_date='10/2025', ccv='123', billing_type='Out')
         client = Client(subscription_id=1)
-        professional = Professional(2, 1)
+        services = [
+            Service(service_id=1, service_name='Tree Removal'),
+            Service(service_id=2, service_name='Oven Repairs')
+        ]
+        professional = Professional(user_id=1, professional_id=2, subscription_id=1,
+                                    services=services, CCin=billing_in)
+        security_questions = [
+            User_Question(user_question_id=None, user_id=147, answer="Cat", security_question_id=1),
+            User_Question(user_question_id=None, user_id=147, answer="Cat", security_question_id=1)
+        ]
         usr = User(user_id=1, first_name='James', last_name='Bond', email_address='jbond@gmail.com',
                    mobile='04102342342', address=address, password='password', client=client, professional=professional,
-                   ccout=billing_out)
+                   ccout=billing_out, security_questions=security_questions)
 
         packager = Encoder(usr)
         print(packager.serialize())
@@ -67,20 +78,20 @@ class TestPackager(unittest.TestCase):
                         "billingType": "In"
                     }
                 },
-                "securityQuestions": {
-                    "securityQuestion1": {
+                "securityQuestions": [
+                    {
                         "securityQuestion": "What was your first car?",
                         "answer": "Car"
                     },
-                    "securityQuestion2": {
+                    {
                         "securityQuestion": "What was your childhood nickname?",
                         "answer": "Nickname"
                     },
-                    "securityQuestion3": {
+                    {
                         "securityQuestion": "What city were you born in?",
                         "answer": "City"
                     }
-                }                    
+                ]                                    
             }
         """
 

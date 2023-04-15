@@ -117,12 +117,70 @@ class Professional:
 
         return True
 
+    def retrieve_services(self):
+        # connect to database
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # create database query
+        database.clear()
+        database.select(('service_id',), 'associated_service')
+        database.where('professional_id = %s', self.professional_id)
+
+        # run query
+        try:
+            results = database.run()
+        except Exception as e:
+            raise e
+
+        services = []
+        for provided_service in results:
+            services.append(Service.get_by_service_id(provided_service[0]))
+
+        self.services = services
+
+    def get_service_names(self) -> [str]:
+        services = []
+        for service in self.services:
+            services.append(service.service_name)
+
+        return services
+
+    @staticmethod
+    def get_professional(user_id: int):
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # check if database is connected, if not connect
+        if database.status is DatabaseStatus.Disconnected:
+            database.connect()
+
+        # get user object
+        database.clear()
+        database.select(('professional_id', 'subscription_id', 'user_id'), 'professional')
+        database.where('user_id = %s', user_id)
+
+        # try to get authorisation
+        professional = None
+        try:
+            results = database.run()
+
+        except Exception as e:
+            raise e
+
+        if len(results) > 0:  # i.e something is returned
+            professional = Professional(professional_id=results[0][0], subscription_id=results[0][1],
+                                        user_id=results[0][2])
+
+            # get services
+            professional.retrieve_services()
+
+        return professional
+
     @staticmethod
     def ToAPI(obj):
         if isinstance(obj, Professional):
             remap = {
-                "services": obj.services,
-                "CCIn": obj.CCin
+                "services": obj.get_service_names()
             }
             return remap
 
@@ -131,12 +189,12 @@ class Professional:
     @staticmethod
     def FromAPI(obj):
         # get subscription_id from 'Subscription' value (could change ids in the future)
-        subscription_name = 'Subscription'
+        subscription_name = 'Subscription'  # always subscription
         database = Database.database_handler(DatabaseLookups.User)
-        database.clear()
         database.select(('subscription_id',), 'subscription')
         database.where('subscription_name = %s', subscription_name)
         results = database.run()
+
         subscription_id = results[0][0] if results is not None else None
 
         return Professional(services=obj.get('services'), CCin=obj.get('CCIn'), subscription_id=subscription_id)

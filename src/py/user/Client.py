@@ -6,6 +6,7 @@ from mysql.connector import errors
 from util.database.Database import Database
 from util.database.DatabaseStatus import DatabaseStatus
 from util.database.DatabaseLookups import DatabaseLookups
+from user.Subscription import Subscription
 
 
 @dataclass
@@ -96,6 +97,34 @@ class Client:
             return False
 
         return True
+
+    @staticmethod
+    def get_client(user_id: int):
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # check if database is connected, if not connect
+        if database.status is DatabaseStatus.Disconnected:
+            database.connect()
+
+        # get user object
+        database.clear()
+        database.select(('client_id', 'subscription_id', 'user_id'),
+                        'client')
+        database.where('user_id = %s', user_id)
+
+        # try to get authorisation
+        client = None
+        try:
+            results = database.run()
+
+        except Exception as e:
+            raise e
+
+        if len(results) > 0:
+            client = Client(client_id=results[0][0], subscription_id=results[0][1], user_id=results[0][2])
+
+        return client
 
     def get_membership_type(self):
         try:
