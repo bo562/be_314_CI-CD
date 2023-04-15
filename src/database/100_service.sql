@@ -1,6 +1,6 @@
 CREATE TABLE service (
      service_id         INT NOT NULL AUTO_INCREMENT,
-     service_name       VARCHAR(255) NOT NULL
+     service_name       VARCHAR(255) NOT NULL,
      retired            DATETIME,
      PRIMARY KEY (service_id)
 );
