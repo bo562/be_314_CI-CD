@@ -26,11 +26,10 @@ class TestDatabase(unittest.TestCase):
 
     def test_where_select(self):
         database = Database.database_handler(DatabaseLookups.User)
-        database.clear()
 
         # select from specific table
-        database.select(('user.user_id',), 'user')
-        database.where("user_id = %s ", "1",)
+        database.select(('user_id',), 'user')
+        database.where("user_id = %s ", 1)
 
         # review query
         print(database.review_query())
@@ -144,6 +143,15 @@ class TestDatabase(unittest.TestCase):
         results = database.query(query, args)
 
         print(results)
+
+    def test_temp(self):
+        # connect to database
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # create database query
+        database.clear()
+        database.select(('service_id', 'service_name', 'cost', 'retired'), 'service')
+        database.where('service_name = %s', 'Tree')
 
     def tearDown(self) -> None:
         pass
