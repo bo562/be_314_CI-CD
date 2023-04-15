@@ -5,7 +5,6 @@ CREATE TABLE address (
      street_name        VARCHAR(200) NOT NULL,
      suburb             VARCHAR(50) NOT NULL,
      postcode           INT NOT NULL,
-     state              VARCHAR(10) NOT NULL,
      PRIMARY KEY (address_id),
      FOREIGN KEY (user_id) REFERENCES user(user_id)
 );

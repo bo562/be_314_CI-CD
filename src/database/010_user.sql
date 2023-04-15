@@ -4,7 +4,7 @@ CREATE TABLE user (
      last_name          VARCHAR(100) NOT NULL,
      email_address      VARCHAR(200) NOT NULL,
      mobile             VARCHAR(20) NOT NULL,
-     password           VARCHAR(20) NOT NULL,
+     password           VARCHAR(32) NOT NULL,
      PRIMARY KEY (user_id)
 );
 

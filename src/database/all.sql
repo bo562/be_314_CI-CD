@@ -39,7 +39,7 @@ CREATE TABLE user (
      last_name          VARCHAR(100) NOT NULL,
      email_address      VARCHAR(200) NOT NULL,
      mobile             VARCHAR(20) NOT NULL,
-     password           VARCHAR(20) NOT NULL,
+     password           VARCHAR(32) NOT NULL,
      PRIMARY KEY (user_id)
 );
 
@@ -90,7 +90,6 @@ CREATE TABLE address (
      street_name        VARCHAR(200) NOT NULL,
      suburb             VARCHAR(50) NOT NULL,
      postcode           INT NOT NULL,
-     state              VARCHAR(10) NOT NULL,
      PRIMARY KEY (address_id),
      FOREIGN KEY (user_id) REFERENCES user(user_id)
 );
@@ -117,7 +116,7 @@ CREATE TABLE billing (
      billing_id         MEDIUMINT NOT NULL AUTO_INCREMENT,
      user_id            MEDIUMINT NOT NULL,
      name               VARCHAR(100) NOT NULL,
-     card_number        VARCHAR(10) NOT NULL,
+     card_number        VARCHAR(256) NOT NULL,
      expiry_date        DATE NOT NULL,
      ccv                INT NOT NULL,
      billing_type_id    INT NOT NULL,       
@@ -155,8 +154,7 @@ CREATE UNIQUE INDEX uc_user_question_question ON user_question(user_id, security
 -- From: 100_service.sql 
 CREATE TABLE service (
      service_id         INT NOT NULL AUTO_INCREMENT,
-     service_name       VARCHAR(255) NOT NULL,
-     cost               DECIMAL(10,2) NOT NULL,
+     service_name       VARCHAR(255) NOT NULL
      retired            DATETIME,
      PRIMARY KEY (service_id)
 );
@@ -323,37 +321,29 @@ COMMIT;
   
 -- ---------------------------- 
 -- From: 320_insert_service.sql 
-INSERT INTO service (service_name,  cost) values ('Lawn mowing', 120.00);
+INSERT INTO service (service_name) values ('Tree Removal');
 
-INSERT INTO service (service_name,  cost) values ('Weeding', 130.00);
+INSERT INTO service (service_name) values ('Roof Cleaning');
 
-INSERT INTO service (service_name,  cost) values ('Mulching', 150.00);
+INSERT INTO service (service_name) values ('Fence Installation');
 
-INSERT INTO service (service_name,  cost) values ('Plumbing Repair', 220.00);
+INSERT INTO service (service_name) values ('Plumbing');
 
-INSERT INTO service (service_name,  cost) values ('Electrical Repair', 250.00);
+INSERT INTO service (service_name) values ('Oven Repairs');
 
-INSERT INTO service (service_name,  cost) values ('Whitegoods Installation', 110.00);
-
-INSERT INTO service (service_name,  cost) values ('Locks changed', 170.00);
-
-INSERT INTO service (service_name,  cost) values ('Cleaning', 190.00);
-
-commit;  
+COMMIT;  
   
 -- ---------------------------- 
 -- From: 330_insert_request_status.sql 
-INSERT INTO request_status (status_name) values ('Open');
+INSERT INTO request_status (status_name) values ('New');
 
-INSERT INTO request_status (status_name) values ('Assigned');
+INSERT INTO request_status (status_name) values ('Pending Acceptance');
 
-INSERT INTO request_status (status_name) values ('In progress');
+INSERT INTO request_status (status_name) values ('Pending Completion');
 
-INSERT INTO request_status (status_name) values ('Completed - not paid');
+INSERT INTO request_status (status_name) values ('Complete');
 
-INSERT INTO request_status (status_name) values ('Completed');
-
-INSERT INTO request_status (status_name) values ('Cancelled');
+INSERT INTO request_status (status_name) values ('Archived');
 
 COMMIT;  
   
@@ -374,8 +364,6 @@ COMMIT;
 INSERT INTO transaction_status (status_name) values ('Accepted');
 
 INSERT INTO transaction_status (status_name) values ('Rejected');
-
-INSERT INTO transaction_status (status_name) values ('Cancelled');
 
 COMMIT;  
   
