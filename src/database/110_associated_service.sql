@@ -1,6 +1,6 @@
 -- ToDo: rename table to provided_service
 CREATE TABLE associated_service (
-	 provided_service_id MEDIUMINT NOT NULL AUTO_INCREMENT,
+     provided_service_id MEDIUMINT NOT NULL AUTO_INCREMENT,
      service_id          MEDIUMINT NOT NULL,
      professional_id     MEDIUMINT NOT NULL,
      PRIMARY KEY (provided_service_id),
@@ -8,5 +8,4 @@ CREATE TABLE associated_service (
      FOREIGN KEY (professional_id) REFERENCES professional(professional_id)
 );
 CREATE UNIQUE INDEX uc_associated_service ON 
-	associated_service(professional_id, service_id);
-
+    associated_service(professional_id, service_id);
