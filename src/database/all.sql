@@ -1,9 +1,9 @@
------------------------------- 
+-- ---------------------------- 
 -- Tradie System Schema Script 
------------------------------- 
+-- --------------------------- 
   
   
------------------------------- 
+-- ---------------------------- 
 -- From: 010_user.sql 
 CREATE TABLE user (
      user_id            MEDIUMINT NOT NULL AUTO_INCREMENT,
@@ -17,7 +17,7 @@ CREATE TABLE user (
 
 CREATE UNIQUE INDEX ak_user_email ON user(email_address);  
   
------------------------------- 
+-- ---------------------------- 
 -- From: 020_subscription.sql 
 CREATE TABLE subscription (
      subscription_id    MEDIUMINT NOT NULL AUTO_INCREMENT,
@@ -28,7 +28,7 @@ CREATE TABLE subscription (
 
 CREATE UNIQUE INDEX idx_subscription_name ON subscription(subscription_name);  
   
------------------------------- 
+-- ---------------------------- 
 -- From: 030_client.sql 
 CREATE TABLE client (
      client_id          MEDIUMINT NOT NULL AUTO_INCREMENT,
@@ -40,7 +40,7 @@ CREATE TABLE client (
 );
 CREATE UNIQUE INDEX ak_client_user_id ON client(user_id);  
   
------------------------------- 
+-- ---------------------------- 
 -- From: 040_professional.sql 
 CREATE TABLE professional (
      professional_id    MEDIUMINT NOT NULL AUTO_INCREMENT,
@@ -53,7 +53,7 @@ CREATE TABLE professional (
 
 CREATE UNIQUE INDEX ak_professional_user_id ON client(user_id);  
   
------------------------------- 
+-- ---------------------------- 
 -- From: 050_address.sql 
 CREATE TABLE address (
      address_id         MEDIUMINT NOT NULL AUTO_INCREMENT,
@@ -69,7 +69,7 @@ CREATE TABLE address (
 
 CREATE UNIQUE INDEX ak_address_user_id ON address(user_id);  
   
------------------------------- 
+-- ---------------------------- 
 -- From: 060_billing_type.sql 
 CREATE TABLE billing_type (
      billing_type_id    INT NOT NULL AUTO_INCREMENT,
@@ -82,7 +82,7 @@ CREATE INDEX idx_billing_type_name ON billing_type(billing_type_name);
 
 CREATE UNIQUE INDEX uc_address_user_id ON billing_type(billing_type_name, retired);  
   
------------------------------- 
+-- ---------------------------- 
 -- From: 070_billing.sql 
 -- If retired is null then the record is active
 CREATE TABLE billing (
@@ -100,7 +100,7 @@ CREATE TABLE billing (
 
 CREATE UNIQUE INDEX uc_billing_user_id ON billing(user_id, billing_type_id, retired);  
   
------------------------------- 
+-- ---------------------------- 
 -- From: 080_security_question.sql 
 CREATE TABLE security_question (
      security_question_id  MEDIUMINT NOT NULL AUTO_INCREMENT,
@@ -109,7 +109,7 @@ CREATE TABLE security_question (
      PRIMARY KEY (security_question_id)
 );  
   
------------------------------- 
+-- ---------------------------- 
 -- From: 090_user_question.sql 
 CREATE TABLE user_question (
      user_question_id     MEDIUMINT NOT NULL AUTO_INCREMENT,
@@ -123,7 +123,7 @@ CREATE TABLE user_question (
 
 CREATE UNIQUE INDEX uc_user_question_question ON user_question(user_id, security_question_id);  
   
------------------------------- 
+-- ---------------------------- 
 -- From: 100_service.sql 
 CREATE TABLE service (
      service_id         MEDIUMINT NOT NULL AUTO_INCREMENT,
@@ -137,7 +137,7 @@ CREATE UNIQUE INDEX uc_service_name ON service(service_name, retired);
 
   
   
------------------------------- 
+-- ---------------------------- 
 -- From: 110_associated_service.sql 
 -- ToDo: rename table to provided_service
 CREATE TABLE associated_service (
@@ -151,7 +151,7 @@ CREATE TABLE associated_service (
 CREATE UNIQUE INDEX uc_associated_service ON 
     associated_service(professional_id, service_id);  
   
------------------------------- 
+-- ---------------------------- 
 -- From: 120_authorisation.sql 
 CREATE TABLE authorisation (
      authorisation_id   MEDIUMINT NOT NULL AUTO_INCREMENT,
@@ -163,7 +163,7 @@ CREATE TABLE authorisation (
      FOREIGN KEY (user_id) REFERENCES user(user_id)
 );  
   
------------------------------- 
+-- ---------------------------- 
 -- From: 130_session.sql 
 CREATE TABLE session (
       session_id         MEDIUMINT NOT NULL AUTO_INCREMENT,
@@ -174,7 +174,7 @@ CREATE TABLE session (
      FOREIGN KEY (authorisation_id) REFERENCES authorisation(authorisation_id)
 );  
   
------------------------------- 
+-- ---------------------------- 
 -- From: 140_request_status.sql 
 CREATE TABLE request_status (
      request_status_id           MEDIUMINT NOT NULL,
@@ -184,7 +184,7 @@ CREATE TABLE request_status (
 
 CREATE UNIQUE INDEX uc_request_status_name ON request_status(status_name);  
   
------------------------------- 
+-- ---------------------------- 
 -- From: 150_request.sql 
 CREATE TABLE request (
      request_id         MEDIUMINT NOT NULL AUTO_INCREMENT,
@@ -202,7 +202,7 @@ CREATE TABLE request (
      FOREIGN KEY (service_id) REFERENCES service(service_id)
 );  
   
------------------------------- 
+-- ---------------------------- 
 -- From: 160_request_subscription.sql 
 CREATE TABLE request_subscription (
      request_id            MEDIUMINT NOT NULL,
@@ -212,7 +212,7 @@ CREATE TABLE request_subscription (
      FOREIGN KEY (subscription_id) REFERENCES subscription(subscription_id)
 );  
   
------------------------------- 
+-- ---------------------------- 
 -- From: 170_request_transcation.sql 
 CREATE TABLE request_transaction (
      request_id           MEDIUMINT NOT NULL,
@@ -222,7 +222,7 @@ CREATE TABLE request_transaction (
      FOREIGN KEY (transaction_id) REFERENCES transaction(transaction_id)
 );  
   
------------------------------- 
+-- ---------------------------- 
 -- From: 180_bid_status.sql 
 CREATE TABLE bid_status (
      bid_status_id               MEDIUMINT NOT NULL,
@@ -232,7 +232,23 @@ CREATE TABLE bid_status (
 
 CREATE UNIQUE INDEX uc_bid_status_name ON bid_status(status_name);  
   
------------------------------- 
+-- ---------------------------- 
+-- From: 190_request_bid.sql 
+CREATE TABLE request_bid (
+     request_bid_id               MEDIUMINT NOT NULL AUTO_INCREMENT,
+     request_id                   MEDIUMINT NOT NULL,
+     professional_id              MEDIUMINT NOT NULL,
+     sent_date                    DATETIME NOT NULL,
+     accepted_by_client_date      DATETIME,
+     professional_cancelled_date  DATETIME,     
+     bid_status_id                MEDIUMINT NOT NULL,
+     PRIMARY KEY (request_bid_id),
+     FOREIGN KEY (professional_id) REFERENCES client(professional_id),
+     FOREIGN KEY (request_id) REFERENCES request(request_id)
+     FOREIGN KEY (bid_status_id) REFERENCES bid_status(bid_status_id)
+);  
+  
+-- ---------------------------- 
 -- From: 300_insert_billing_type.sql 
 INSERT INTO billing_type (billing_type_name,retired) VALUES ('Out', null);
 
@@ -240,7 +256,7 @@ INSERT INTO billing_type (billing_type_name,retired) VALUES ('In', null);
 
 COMMIT;  
   
------------------------------- 
+-- ---------------------------- 
 -- From: 310_insert_subscriptions.sql 
 INSERT INTO subscription (subscription_name, fee) VALUES ('Subscription', 100.50);
 
@@ -248,7 +264,7 @@ INSERT INTO subscription (subscription_name, fee) VALUES ('Single', 0);
 
 COMMIT;  
   
------------------------------- 
+-- ---------------------------- 
 -- From: 320_insert_service.sql 
 INSERT INTO service (service_name,  cost, retired) values ('Lawn mowing', 120, null);
 
@@ -268,7 +284,7 @@ INSERT INTO service (service_name,  cost, retired) values ('Cleaning', 190, null
 
 commit;  
   
------------------------------- 
+-- ---------------------------- 
 -- From: 330_insert_request_status.sql 
 INSERT INTO bid_status (request_status_id, status_name) values (1, 'Open');
 
@@ -284,7 +300,7 @@ INSERT INTO bid_status (request_status_id, status_name) values (4, 'Cancelled');
 
 COMMIT;  
   
------------------------------- 
+-- ---------------------------- 
 -- From: 340_insert_bid_status.sql 
 CREATE UNIQUE INDEX uc_bid_status_name ON bid_status(status_name);
 
