@@ -25,7 +25,7 @@ class Service:
         database = Database.database_handler(DatabaseLookups.User)
 
         # create database query
-        database.select(('service_id', 'service_name', 'cost', 'retired'), 'service')
+        database.select(('service_id', 'service_name', 'retired'), 'service')
         database.where('service_id = %s', service_id)
 
         # run query
@@ -41,8 +41,8 @@ class Service:
         database.clear()
         database.disconnect()
 
-        # return service object from result (some what dangerous if indexing becomes incorrect
-        return Service(service_id=results[0][0], service_name=results[0][1], cost=results[0][2], retired=results[0][3])
+        # return service object from result (some what dangerous if indexing becomes incorrect)
+        return Service(service_id=results[0][0], service_name=results[0][1], retired=results[0][2])
 
     @staticmethod
     def get_by_service_name(service_name) -> 'Service':

@@ -9,6 +9,8 @@ from util.database.Database import Database
 from util.database.DatabaseStatus import DatabaseStatus
 from mysql.connector import errors
 
+from util.handling.errors.database.DatabaseObjectAlreadyExists import DatabaseObjectAlreadyExists
+
 
 @dataclass()
 class Request:
@@ -42,17 +44,21 @@ class Request:
         database.insert(self, 'request', ('request_id', 'professional_id', 'completion_date', 'request_status_id', 'status_name',))
 
         try:
-            addressid = database.run()
+            address_id = database.run()
             database.commit()
         except errors.IntegrityError as ie:  # in case that user already exists
-            if ie.errno == 1452:  # cannot solve gracefully
-                raise ie
+            # revert changes and remove lock
+            database.rollback()
 
-            # constructing query to return already created user
+            # clear tool
+            query = database.review_query()
             database.clear()
-            database.select(('address_id',), 'address')
-            database.where('user_id = %s', self.user_id)
-            address_id = database.run()[0][0]
+
+            if ie.errno == 1452:  # cannot solve gracefully
+                raise DatabaseObjectAlreadyExists(status_code=400, table='request', query=query, database_object=self,
+                                                  message=ie.msg)
+
+
 
         self.address_id = address_id
 
@@ -108,3 +114,7 @@ class Request:
                 "requestDate": obj.request_date,
                 "serviceType": Service.get_by_service_id(obj.service_id).service_name
             }
+
+    @staticmethod
+    def FromAPI(obj):
+        # get client_id from passed user_id
