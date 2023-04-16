@@ -124,10 +124,26 @@ class User:
             self.address.update_address(self.user_id)
 
         if self.client is not None:
+            # check if client previously existed
+            client = Client.get_client(self.user_id)
+
+            # if client exists update, else create the client
+            if client is None:
+                self.client = self.client.create_client(self.user_id)
+            else:
+                self.client.update_client(self.user_id)
+
             self.client.update_client(self.user_id)
 
         if self.professional is not None:
-            self.professional.update_professional(self.user_id)
+            # check if professional previously existed
+            professional = Professional.get_professional(self.user_id)
+
+            # if client exists update, else create the professional
+            if professional is None:
+                self.professional = self.professional.create_professional(self.user_id)
+            else:
+                self.professional.update_professional(self.user_id)
 
         # commit and close database connection
         database.disconnect()

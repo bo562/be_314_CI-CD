@@ -99,7 +99,7 @@ class Professional:
         # clear database tool
         database.clear()
 
-        return self
+        return self.get_professional(self.user_id)
 
     def delete_professional(self):
         # create database connection
