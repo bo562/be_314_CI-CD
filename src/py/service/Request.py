@@ -3,6 +3,7 @@ py that handles data for requests type
 """
 from datetime import datetime
 from dataclasses import dataclass
+from service.Service import Service
 from util.database.DatabaseLookups import DatabaseLookups
 from util.database.Database import Database
 from util.database.DatabaseStatus import DatabaseStatus
@@ -97,3 +98,13 @@ class Request:
 
     def get_request(self):
         pass
+
+
+    @staticmethod
+    def ToAPI(obj):
+        if isinstance(obj, Request):
+            remap = {
+                "requestID": obj.request_id,
+                "requestDate": obj.request_date,
+                "serviceType": Service.get_by_service_id(obj.service_id).service_name
+            }

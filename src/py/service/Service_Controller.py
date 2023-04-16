@@ -4,8 +4,12 @@ py that describes the controller for the service sub-package. Enabling...
 
 
 class Service_Controller:
-    def __init__(self):
-        pass
+    __event: str  # actual data sent from api gateway
+    __context = None
+
+    def __init__(self, event: str):
+        self.__event = event
+        self.__context = event.get('context')
 
     def create_request(self):
         pass
