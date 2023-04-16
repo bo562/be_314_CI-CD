@@ -17,10 +17,9 @@ class Decoder:
     __object: str
     __class_type: type
 
-    def __init__(self, obj, class_type: type):
+    def __init__(self, obj):
         # pass variables to parent class
         self.__object = obj
-        self.__class_type = class_type
 
     def deserialize(self):
         decoded = json.loads(self.__object, object_hook=Decoder.default)

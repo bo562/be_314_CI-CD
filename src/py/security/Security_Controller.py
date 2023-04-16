@@ -6,7 +6,6 @@ handling generating tokens, verifying tokens etc.
 import json
 from security.Authorisation import Authorisation
 from security.Session import Session
-from user.Subscription import Subscription
 from user.User import User
 from util.packager.Decoder import Decoder
 from util.packager.Encoder import Encoder

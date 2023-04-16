@@ -6,6 +6,9 @@ from mysql.connector import errors
 from util.database.Database import Database
 from util.database.DatabaseStatus import DatabaseStatus
 from util.database.DatabaseLookups import DatabaseLookups
+from util.handling.errors.database.DatabaseObjectAlreadyExists import DatabaseObjectAlreadyExists
+from util.handling.errors.database.FailedToCreateDatabaseObject import FailedToCreateDatabaseObject
+from util.handling.errors.database.FailedToUpdateDatabaseObject import FailedToUpdateDatabaseObject
 
 
 @dataclass
@@ -37,31 +40,25 @@ class Billing:
             database.commit()
 
         except errors.IntegrityError as ie:
+            database.rollback()
+            query = database.review_query()
+            database.clear()
+            database.disconnect()
+
+            # if there is an integrity error
             if ie.errno == 1452:  # cannot solve gracefully
-                database.clear()
-                return None
+                # raise error
+                raise DatabaseObjectAlreadyExists(table='user', query=query, database_object=self)
 
-            # return billing data, get billing type first
-            database.clear()
-            database.select(('billing_type_id',), 'billing_type')
-            database.where('billing_type_name = %s', 'Out')
-            billing_type_id = database.run()
-
-            # get billing data
-            database.clear()
-            database.select(('billing_id', ), 'billing')
-            database.where('card_number = %s', self.card_number)
-            database.ampersand('ccv = %s', self.ccv)
-
-            self.billing_id = database.run()
-
-            return self
+            # some other consistency constraint check
+            raise FailedToCreateDatabaseObject(table='user', query=query, database_object=self)
 
         # set billing_id
         self.billing_id = billing_id
 
-        # clear database tool
+        # clear database tool and disconnect
         database.clear()
+        database.disconnect()
 
         return self
 
@@ -89,10 +86,22 @@ class Billing:
             database.commit()
 
         except errors.IntegrityError as ie:
-            return None
+            database.rollback()
+            query = database.review_query()
+            database.clear()
+            database.disconnect()
 
-        # clear database tool
+            # if there is an integrity error
+            if ie.errno == 1452:  # cannot solve gracefully
+                # raise error
+                raise DatabaseObjectAlreadyExists(table='user', query=query, database_object=self)
+
+            # some other consistency constraint check
+            raise FailedToUpdateDatabaseObject(table='user', query=query, database_object=self)
+
+        # clear database tool and disconnect
         database.clear()
+        database.disconnect()
 
         return self
 
@@ -108,6 +117,7 @@ class Billing:
             database.run()
             database.commit()
         except Exception as e:
+            database.rollback()
             return False
 
         return True

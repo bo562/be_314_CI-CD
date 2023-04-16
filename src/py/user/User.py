@@ -12,7 +12,10 @@ from user.Billing import Billing
 from util.database.Database import Database
 from util.database.DatabaseLookups import DatabaseLookups
 from util.database.DatabaseStatus import DatabaseStatus
-import json
+from util.handling.errors.database.DatabaseObjectAlreadyExists import DatabaseObjectAlreadyExists
+from util.handling.errors.database.DatabaseProgrammingError import DatabaseProgrammingError
+from util.handling.errors.database.FailedToCreateDatabaseObject import FailedToCreateDatabaseObject
+from util.handling.errors.database.FailedToUpdateDatabaseObject import FailedToUpdateDatabaseObject
 
 
 @dataclass
@@ -45,24 +48,43 @@ class User:
             database.commit()
 
         except errors.IntegrityError as ie:  # in case that user already exists
+            query = database.review_query()  # retrieve query
+
+            # clean up instance
+            database.rollback()
             database.clear()
-            print(ie)
-            raise Exception(f'User Already Exists')
+            database.disconnect()
+
+            if ie.errno == 1452:  # cannot solve gracefully
+                # raise error
+                raise DatabaseObjectAlreadyExists(table='user', query=query, database_object=self)
+
+            raise FailedToCreateDatabaseObject(table='user', query=query, database_object=self)
 
         # add nested classes
-        self.ccout = self.ccout.create_billing(self.user_id)
+        # attempt to create billing object
+        try:
+            self.ccout = self.ccout.create_billing(self.user_id)
 
-        # check if creation was successful
-        if self.ccout is None:
+        except DatabaseObjectAlreadyExists as doae:
+            self.delete_user()  # abort creation of user object
+            raise doae
+
+        except FailedToCreateDatabaseObject as fcdo:
             self.delete_user()
-            raise Exception(f'User Creation Failed Due to Billing')
+            raise fcdo
 
-        self.address = self.address.create_address(self.user_id)
+        # attempt to create address object
+        try:
+            self.address = self.address.create_address(self.user_id)
 
-        # check if creation was successful
-        if self.address is None:
+        except DatabaseObjectAlreadyExists as doae:
+            self.delete_user()  # abort creation of user object
+            raise doae
+
+        except FailedToCreateDatabaseObject as fcdo:
             self.delete_user()
-            raise Exception(f'User Creation Failed Due to Address')
+            raise fcdo
 
         # due to multiple questions, need to loop and call
         security_questions = []
@@ -100,36 +122,70 @@ class User:
         if database.status is DatabaseStatus.Disconnected:
             database.connect()
 
-        # attempt to create base user
-        database.clear()
-        database.update(self, 'user', ('user_id', 'address', 'ccout', 'client', 'professional', 'security_questions'))
-        database.where('user_id = %s', self.user_id)
+        # only if the base fields are not empty run updates on user table
+        if self.check_empty() is False:
+            # attempt to update base user
+            database.update(self, 'user', ('user_id', 'address', 'ccout', 'client', 'professional', 'security_questions'))
+            database.where('user_id = %s', self.user_id)
 
-        # run database query and commit
-        try:
-            database.run()
-            database.commit()
+            # run database query and commit
+            try:
+                database.run()
+                database.commit()
 
-        except errors.IntegrityError as ie:  # in case that user already exists
-            raise ie
+            except errors.IntegrityError as ie:  # in case that change violates consistency constraints
+                database.rollback()
+                query = database.review_query()
+                database.clear()
+                database.disconnect()
 
-        except Exception as e:  # other unhandled exceptions
-            raise e
+                # if there is an integrity error
+                if ie.errno == 1452:  # cannot solve gracefully
+                    # raise error
+                    raise DatabaseObjectAlreadyExists(table='user', query=query, database_object=self)
+
+                # some other consistency constraint check
+                raise FailedToUpdateDatabaseObject(table='user', query=query, database_object=self)
+
+            except errors.ProgrammingError as e:  # due to no columns being updated
+                database.rollback()
+                query = database.review_query()
+                database.clear()
+                database.disconnect()
+
+                raise DatabaseProgrammingError(table='user', query=query, database_object=self)
 
         # conditional nesting (may not occur for all user updates)
-        if self.ccout is not None:
+        if self.ccout is not None and type(self.ccout) != dict:
             self.ccout.update_billing(self.user_id)
 
-        if self.address is not None:
+        if self.address is not None and type(self.address) != dict:
             self.address.update_address(self.user_id)
 
-        if self.client is not None:
+        if self.client is not None and type(self.client) != dict:
+            # check if client previously existed
+            client = Client.get_client(self.user_id)
+
+            # if client exists update, else create the client
+            if client is None:
+                self.client = self.client.create_client(self.user_id)
+            else:
+                self.client.update_client(self.user_id)
+
             self.client.update_client(self.user_id)
 
-        if self.professional is not None:
-            self.professional.update_professional(self.user_id)
+        if self.professional is not None and type(self.professional) != dict:
+            # check if professional previously existed
+            professional = Professional.get_professional(self.user_id)
+
+            # if client exists update, else create the professional
+            if professional is None:
+                self.professional = self.professional.create_professional(self.user_id)
+            else:
+                self.professional.update_professional(self.user_id)
 
         # commit and close database connection
+        database.clear()
         database.disconnect()
 
         return self.get_user(self.user_id)
@@ -159,7 +215,9 @@ class User:
         try:
             database.run()
             database.commit()
+
         except Exception as e:
+            database.rollback()
             raise e
 
     # validate user_question
@@ -173,6 +231,21 @@ class User:
                     break
 
         return passed
+
+    # check if all base fields are null
+    def check_empty(self) -> bool:
+        count = 0
+
+        # add 1 to count if all the fields are none
+        if self.user_id is None: count += 5
+        if self.first_name is None: count += 1
+        if self.last_name is None: count += 1
+        if self.email_address is None: count += 1
+        if self.mobile is None: count += 1
+        if self.password is None: count += 1
+
+        # if count is 5 then object is empty, if count is less than 5 then okay to run queries
+        return True if count >= 5 else False
 
     # return user object (possibly in json form)
     @staticmethod
@@ -238,7 +311,6 @@ class User:
         database = Database.database_handler(DatabaseLookups.User)
 
         # create database query
-        database.clear()
         database.select(('user_id',), 'user')
         database.where('email_address = %s', email)
 
