@@ -9,6 +9,9 @@ from user.Billing import Billing
 from util.database.Database import Database
 from util.database.DatabaseLookups import DatabaseLookups
 from util.database.DatabaseStatus import DatabaseStatus
+from util.handling.errors.database.DatabaseObjectAlreadyExists import DatabaseObjectAlreadyExists
+from util.handling.errors.database.FailedToCreateDatabaseObject import FailedToCreateDatabaseObject
+from util.handling.errors.database.FailedToUpdateDatabaseObject import FailedToUpdateDatabaseObject
 
 
 @dataclass
@@ -41,16 +44,18 @@ class Professional:
             database.commit()
 
         except errors.IntegrityError as ie:
-            if ie.errno == 1452:  # cannot solve gracefully
-                raise ie
-
-            # get billing data
+            database.rollback()
+            query = database.review_query()
             database.clear()
-            database.select(('professional_id',), 'professional')
-            database.where('user_id = %s', self.user_id)
+            database.disconnect()
 
-            self.professional_id = database.run()
-            return self
+            # if there is an integrity error
+            if ie.errno == 1452:  # cannot solve gracefully
+                # raise error
+                raise DatabaseObjectAlreadyExists(table='user', query=query, database_object=self)
+
+            # some other consistency constraint check
+            raise FailedToCreateDatabaseObject(table='user', query=query, database_object=self)
 
         # add associated services for professional
         if self.services is not None:
@@ -94,12 +99,23 @@ class Professional:
             database.commit()
 
         except errors.IntegrityError as ie:
-            raise ie
+            database.rollback()
+            query = database.review_query()
+            database.clear()
+            database.disconnect()
+
+            # if there is an integrity error
+            if ie.errno == 1452:  # cannot solve gracefully
+                # raise error
+                raise DatabaseObjectAlreadyExists(table='user', query=query, database_object=self)
+
+            # some other consistency constraint check
+            raise FailedToUpdateDatabaseObject(table='user', query=query, database_object=self)
 
         # clear database tool
         database.clear()
 
-        return self
+        return self.get_professional(self.user_id)
 
     def delete_professional(self):
         # create database connection
@@ -117,12 +133,70 @@ class Professional:
 
         return True
 
+    def retrieve_services(self):
+        # connect to database
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # create database query
+        database.clear()
+        database.select(('service_id',), 'associated_service')
+        database.where('professional_id = %s', self.professional_id)
+
+        # run query
+        try:
+            results = database.run()
+        except Exception as e:
+            raise e
+
+        services = []
+        for provided_service in results:
+            services.append(Service.get_by_service_id(provided_service[0]))
+
+        self.services = services
+
+    def get_service_names(self) -> [str]:
+        services = []
+        for service in self.services:
+            services.append(service.service_name)
+
+        return services
+
+    @staticmethod
+    def get_professional(user_id: int):
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # check if database is connected, if not connect
+        if database.status is DatabaseStatus.Disconnected:
+            database.connect()
+
+        # get user object
+        database.clear()
+        database.select(('professional_id', 'subscription_id', 'user_id'), 'professional')
+        database.where('user_id = %s', user_id)
+
+        # try to get authorisation
+        professional = None
+        try:
+            results = database.run()
+
+        except Exception as e:
+            raise e
+
+        if len(results) > 0:  # i.e something is returned
+            professional = Professional(professional_id=results[0][0], subscription_id=results[0][1],
+                                        user_id=results[0][2])
+
+            # get services
+            professional.retrieve_services()
+
+        return professional
+
     @staticmethod
     def ToAPI(obj):
         if isinstance(obj, Professional):
             remap = {
-                "services": obj.services,
-                "CCIn": obj.CCin
+                "services": obj.get_service_names()
             }
             return remap
 
@@ -131,12 +205,12 @@ class Professional:
     @staticmethod
     def FromAPI(obj):
         # get subscription_id from 'Subscription' value (could change ids in the future)
-        subscription_name = 'Subscription'
+        subscription_name = 'Subscription'  # always subscription
         database = Database.database_handler(DatabaseLookups.User)
-        database.clear()
         database.select(('subscription_id',), 'subscription')
         database.where('subscription_name = %s', subscription_name)
         results = database.run()
+
         subscription_id = results[0][0] if results is not None else None
 
         return Professional(services=obj.get('services'), CCin=obj.get('CCIn'), subscription_id=subscription_id)

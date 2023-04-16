@@ -17,10 +17,9 @@ class Decoder:
     __object: str
     __class_type: type
 
-    def __init__(self, obj, class_type: type):
+    def __init__(self, obj):
         # pass variables to parent class
         self.__object = obj
-        self.__class_type = class_type
 
     def deserialize(self):
         decoded = json.loads(self.__object, object_hook=Decoder.default)
@@ -37,7 +36,6 @@ class Decoder:
                 'expiryDate' in obj.keys() or \
                 'CCV' in obj.keys() or \
                 'billingType' in obj.keys():  # checking for CCOut field
-            print(obj)
             return Billing.FromAPI(obj)
 
         # checking for address field
@@ -54,9 +52,7 @@ class Decoder:
                 'services' in obj.keys():  # checking for professional field
             return Professional.FromAPI(obj)
 
-        elif 'securityQuestion1' in obj.keys() or \
-                'securityQuestion2' in obj.keys() or \
-                'securityQuestion3' in obj.keys():  # checking for security question field
+        elif 'securityQuestion' in obj.keys():
             return User_Question.FromAPI(obj)
 
         else:

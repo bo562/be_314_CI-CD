@@ -7,6 +7,10 @@ from util.database.Database import Database
 from util.database.DatabaseStatus import DatabaseStatus
 from mysql.connector import errors
 
+from util.handling.errors.database.DatabaseObjectAlreadyExists import DatabaseObjectAlreadyExists
+from util.handling.errors.database.FailedToCreateDatabaseObject import FailedToCreateDatabaseObject
+from util.handling.errors.database.FailedToUpdateDatabaseObject import FailedToUpdateDatabaseObject
+
 
 @dataclass
 class Address:
@@ -37,20 +41,23 @@ class Address:
         try:
             address_id = database.run()
             database.commit()
-        except errors.IntegrityError as ie:  # in case that user already exists
-            if ie.errno == 1452:  # cannot solve gracefully
-                raise ie
-
-            # constructing query to return already created user
+        except errors.IntegrityError as ie:
+            database.rollback()
+            query = database.review_query()
             database.clear()
-            database.select(('address_id', ), 'address')
-            database.where('user_id = %s', self.user_id)
-            address_id = database.run()[0][0]
+            database.disconnect()
 
-        self.address_id = address_id
+            # if there is an integrity error
+            if ie.errno == 1452:  # cannot solve gracefully
+                # raise error
+                raise DatabaseObjectAlreadyExists(table='user', query=query, database_object=self)
+
+            # some other consistency constraint check
+            raise FailedToCreateDatabaseObject(table='user', query=query, database_object=self)
 
         # clear database tool
         database.clear()
+        database.disconnect()
 
         return self
 
@@ -69,7 +76,6 @@ class Address:
             self.user_id = user_id
 
         # create query
-        database.clear()
         database.update(self, 'address', ('address_id',))
         database.where('user_id = %s', self.user_id)
 
@@ -78,10 +84,22 @@ class Address:
             database.commit()
 
         except errors.IntegrityError as ie:
-            raise ie
+            database.rollback()
+            query = database.review_query()
+            database.clear()
+            database.disconnect()
+
+            # if there is an integrity error
+            if ie.errno == 1452:  # cannot solve gracefully
+                # raise error
+                raise DatabaseObjectAlreadyExists(table='user', query=query, database_object=self)
+
+            # some other consistency constraint check
+            raise FailedToUpdateDatabaseObject(table='user', query=query, database_object=self)
 
         # clear database tool
         database.clear()
+        database.disconnect()
 
         return self
 
@@ -100,6 +118,35 @@ class Address:
             return False
 
         return True
+
+    @staticmethod
+    def get_address(user_id: int):
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # check if database is connected, if not connect
+        if database.status is DatabaseStatus.Disconnected:
+            database.connect()
+
+        # get user object
+        database.clear()
+        database.select(('address_id', 'street_number', 'street_name', 'suburb', 'postcode'),
+                        'address')
+        database.where('user_id = %s', user_id)
+
+        # try to get authorisation
+        address = None
+        try:
+            results = database.run()
+
+        except Exception as e:
+            raise e
+
+        if len(results) > 0:
+            address = Address(address_id=results[0][0], street_number=results[0][1], street_name=results[0][2],
+                        suburb=results[0][3], postcode=results[0][4])
+
+        return address
 
     @staticmethod
     def ToAPI(obj):

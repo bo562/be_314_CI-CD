@@ -6,6 +6,10 @@ from mysql.connector import errors
 from util.database.Database import Database
 from util.database.DatabaseStatus import DatabaseStatus
 from util.database.DatabaseLookups import DatabaseLookups
+from user.Subscription import Subscription
+from util.handling.errors.database.DatabaseObjectAlreadyExists import DatabaseObjectAlreadyExists
+from util.handling.errors.database.FailedToCreateDatabaseObject import FailedToCreateDatabaseObject
+from util.handling.errors.database.FailedToUpdateDatabaseObject import FailedToUpdateDatabaseObject
 
 
 @dataclass
@@ -29,24 +33,28 @@ class Client:
             self.user_id = user_id
 
         # attempt to create client now
-        database.clear()
         database.insert(self, 'client', ('client_id',))
 
         try:
             self.client_id = database.run()
             database.commit()
-        except errors.IntegrityError as ie:  # in case that user already exists
-            if ie.errno == 1452:  # cannot solve gracefully
-                raise ie
-
-            # otherwise integrity violation due to existing value
+        except errors.IntegrityError as ie:
+            database.rollback()
+            query = database.review_query()
             database.clear()
-            database.select(('client_id',), 'client')
-            database.where('user_id = %s', self.user_id)
-            self.client_id = database.run()
+            database.disconnect()
+
+            # if there is an integrity error
+            if ie.errno == 1452:  # cannot solve gracefully
+                # raise error
+                raise DatabaseObjectAlreadyExists(table='user', query=query, database_object=self)
+
+            # some other consistency constraint check
+            raise FailedToCreateDatabaseObject(table='user', query=query, database_object=self)
 
         # clear database tool
         database.clear()
+        database.disconnect()
 
         return self
 
@@ -65,7 +73,6 @@ class Client:
             self.user_id = user_id
 
         # create query
-        database.clear()
         database.update(self, 'client', ('client_id',))
         database.where('user_id = %s', self.user_id)
 
@@ -74,10 +81,22 @@ class Client:
             database.commit()
 
         except errors.IntegrityError as ie:
-            raise ie
+            database.rollback()
+            query = database.review_query()
+            database.clear()
+            database.disconnect()
+
+            # if there is an integrity error
+            if ie.errno == 1452:  # cannot solve gracefully
+                # raise error
+                raise DatabaseObjectAlreadyExists(table='user', query=query, database_object=self)
+
+            # some other consistency constraint check
+            raise FailedToUpdateDatabaseObject(table='user', query=query, database_object=self)
 
         # clear database tool
         database.clear()
+        database.disconnect()
 
         return self
 
@@ -97,16 +116,33 @@ class Client:
 
         return True
 
-    def get_membership_type(self):
+    @staticmethod
+    def get_client(user_id: int):
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # check if database is connected, if not connect
+        if database.status is DatabaseStatus.Disconnected:
+            database.connect()
+
+        # get user object
+        database.clear()
+        database.select(('client_id', 'subscription_id', 'user_id'),
+                        'client')
+        database.where('user_id = %s', user_id)
+
+        # try to get authorisation
+        client = None
         try:
-            database = Database.database_handler(DatabaseLookups.user.value)  # create database to connect to
-            database.database_connect()  # connect to database
+            results = database.run()
+
         except Exception as e:
-            print("Database Connection Error")
-        query = "SELECT subscription_type FROM project.subscription WHERE subscription_id=%d"
-        query_data = (self.subscription_id,)
-        return database.database_query(query, query_data)
-        database.database_disconnect()
+            raise e
+
+        if len(results) > 0:
+            client = Client(client_id=results[0][0], subscription_id=results[0][1], user_id=results[0][2])
+
+        return client
 
     @staticmethod
     def ToAPI(obj):

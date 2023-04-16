@@ -5,21 +5,24 @@ The controller should mimic the functionality of expected output of Lambda funct
 """
 
 import json
-from user.User import User
+import user
+from util.handling.Result_Handler import Result_Handler
+from util.handling.errors.database.DatabaseObjectAlreadyExists import DatabaseObjectAlreadyExists
+from util.handling.errors.database.FailedToCreateDatabaseObject import FailedToCreateDatabaseObject
+from util.handling.errors.database.FailedToUpdateDatabaseObject import FailedToUpdateDatabaseObject
 from util.packager.Decoder import Decoder
-from util.packager.Encoder import Encoder
 
 
 class User_Controller:
-    __event: str  # actual data sent from api gateway
+    __event: dict  # actual data sent from api gateway
     __context = None
 
-    def __init__(self, event: str):
+    def __init__(self, event: dict):
         self.__event = event
         self.__context = event.get('context')
 
     @staticmethod
-    def Event_Start(event: str):
+    def Event_Start(event: dict):
         # create controller to handle event
         user_controller = User_Controller(event=event)
 
@@ -40,40 +43,30 @@ class User_Controller:
     def create_user(self) -> object:
         try:
             json_body = self.__event.get('body-json')
-            usr = Decoder(json.dumps(json_body), 'User').deserialize()
+            usr = Decoder(json.dumps(json_body), ).deserialize()
             new_user = usr.create_user()
 
-        except Exception as e:
-            return {
-                "statusCode": "500",
-                "error": e.args
-            }
+        except FailedToCreateDatabaseObject as fcdo:
+            return fcdo.generate_api_error()
 
-        try:
-            encoded = Encoder(new_user).serialize()
-            return encoded
+        except DatabaseObjectAlreadyExists as doae:
+            return doae.generate_api_error()
 
-        except Exception as e:
-            return {
-                "statusCode": "500",
-                "error": e.args
-            }
+        return Result_Handler.Prepare_For_API('200', new_user)
 
-    def update_user(self) -> User:
+    def update_user(self) -> user.User:
         try:
             json_body = self.__event.get('body-json')
-            usr = Decoder(json.dumps(json_body), 'User').deserialize()
+            usr = Decoder(json.dumps(json_body), user.User).deserialize()
             updated_user = usr.update_user()
 
-        except Exception as e:
-            raise e
+        except DatabaseObjectAlreadyExists as doae:
+            return doae.generate_api_error()
 
-        try:
-            encoded = Encoder(updated_user).serialize()
-            return encoded
+        except FailedToUpdateDatabaseObject as fudo:
+            return fudo.generate_api_error()
 
-        except Exception as e:
-            raise e
+        return Result_Handler.Prepare_For_API('200', updated_user)
 
     def validate_user(self) -> dict:
-        return User.validate_email(self.__context.get('email_address'))
+        return user.User.User.validate_email(self.__context.get('email_address'))

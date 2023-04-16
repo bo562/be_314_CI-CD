@@ -99,23 +99,76 @@ class User_Question:
 
         return True
 
-    def get_question(self):
+    def get_question(self, user_question_id: int):
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # check if database is connected
+        if database.status is not DatabaseStatus.Connected:
+            database.connect()
+
+        # create query
+        database.select(('user_question_id', 'user_id', 'answer', 'security_question_id'), 'user_question')
+        database.where('user_question_id = %s', user_question_id)
+
+        # run database query
         try:
-            database = Database.database_handler(DatabaseLookups.user.value)  # create database to connect to
-            database.database_connect()  # connect to database
+            result = database.run()
+
         except Exception as e:
-            print("Database Connection Error")
-        query = "SELECT question FROM project.security_question WHERE security_question_id=%d"
-        query_data = (self.security_question_id)
-        return database.database_query(query, query_data)
-        database.database_disconnect()
+            database.clear()
+            raise e
+
+        # parse data and return
+        return User_Question(user_question_id=result[0][0], user_id=result[0][1], answer=result[0][2],
+                             security_question_id=result[0][3])
+
+    @staticmethod
+    def get_by_user_id(user_id: int):
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # check if database is connected
+        if database.status is not DatabaseStatus.Connected:
+            database.connect()
+
+        # create query
+        database.select(('user_question_id', 'user_id', 'answer', 'security_question_id'), 'user_question')
+        database.where('user_id = %s', user_id)
+
+        # run database query
+        try:
+            results = database.run()
+
+        except Exception as e:
+            database.clear()
+            raise e
+
+        # parse data and return
+        user_questions = []
+        for result in results:
+            user_questions.append(User_Question(user_question_id=result[0], user_id=result[1],
+                                                answer=result[2], security_question_id=result[3]))
+
+        return user_questions
 
     @staticmethod
     def FromAPI(obj):
-        security_questions = []
-        for val in obj:
-            print()
-            security_question = Security_Question.get_by_answer(obj[val].get('securityQuestion'))
-            security_questions.append(User_Question(security_question_id=security_question.security_question_id,
-                                                    answer=obj[val].get('answer')))
-        return security_questions
+        security_question = Security_Question.get_by_answer(obj['securityQuestion'])
+        user_question = User_Question(security_question_id=security_question.security_question_id,
+                                      answer=obj['answer'])
+        return user_question
+
+    @staticmethod
+    def ToAPI(obj, hide_answer: bool = True):
+        print(obj)
+        # get security question
+        security_question = Security_Question.get_by_id(obj.security_question_id)
+
+        # create return
+        result = {
+            "securityQuestion": security_question.question,
+            "answer": obj.answer if hide_answer is False else None  # hide answer if requried
+        }
+
+        return result
