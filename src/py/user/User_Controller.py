@@ -17,12 +17,12 @@ class User_Controller:
     __event: dict  # actual data sent from api gateway
     __context = None
 
-    def __init__(self, event: str):
+    def __init__(self, event: dict):
         self.__event = event
         self.__context = event.get('context')
 
     @staticmethod
-    def Event_Start(event: str):
+    def Event_Start(event: dict):
         # create controller to handle event
         user_controller = User_Controller(event=event)
 
