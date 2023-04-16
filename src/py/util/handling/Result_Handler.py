@@ -10,8 +10,8 @@ import json
 class Result_Handler:
     @staticmethod
     def Prepare_For_API(status_code: str, result: object):
-        return {
-            "statusCode": status_code,
-            # convert the object to a dictionary this means that when aws parses it will not include escapes
-            "result": json.loads(Encoder(result).serialize().decode('utf-8'))  # .decode converts from bytes to string
-        }
+        to_return = dict()
+        to_return['statusCode'] = status_code
+        to_return.update(json.loads(Encoder(result).serialize().decode('utf-8')))  # .decode converts from bytes to string
+
+        return to_return
