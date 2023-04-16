@@ -9,6 +9,9 @@ from user.Billing import Billing
 from util.database.Database import Database
 from util.database.DatabaseLookups import DatabaseLookups
 from util.database.DatabaseStatus import DatabaseStatus
+from util.handling.errors.database.DatabaseObjectAlreadyExists import DatabaseObjectAlreadyExists
+from util.handling.errors.database.FailedToCreateDatabaseObject import FailedToCreateDatabaseObject
+from util.handling.errors.database.FailedToUpdateDatabaseObject import FailedToUpdateDatabaseObject
 
 
 @dataclass
@@ -41,16 +44,18 @@ class Professional:
             database.commit()
 
         except errors.IntegrityError as ie:
-            if ie.errno == 1452:  # cannot solve gracefully
-                raise ie
-
-            # get billing data
+            database.rollback()
+            query = database.review_query()
             database.clear()
-            database.select(('professional_id',), 'professional')
-            database.where('user_id = %s', self.user_id)
+            database.disconnect()
 
-            self.professional_id = database.run()
-            return self
+            # if there is an integrity error
+            if ie.errno == 1452:  # cannot solve gracefully
+                # raise error
+                raise DatabaseObjectAlreadyExists(table='user', query=query, database_object=self)
+
+            # some other consistency constraint check
+            raise FailedToCreateDatabaseObject(table='user', query=query, database_object=self)
 
         # add associated services for professional
         if self.services is not None:
@@ -94,7 +99,18 @@ class Professional:
             database.commit()
 
         except errors.IntegrityError as ie:
-            raise ie
+            database.rollback()
+            query = database.review_query()
+            database.clear()
+            database.disconnect()
+
+            # if there is an integrity error
+            if ie.errno == 1452:  # cannot solve gracefully
+                # raise error
+                raise DatabaseObjectAlreadyExists(table='user', query=query, database_object=self)
+
+            # some other consistency constraint check
+            raise FailedToUpdateDatabaseObject(table='user', query=query, database_object=self)
 
         # clear database tool
         database.clear()

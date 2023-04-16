@@ -2,11 +2,23 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a5225606-bd9d-48d2-a05d-2a6ffdebdba2" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/util/handling/errors/database/DatabaseObjectAlreadyExists.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/handling/errors/database/DatabaseProgrammingError.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/handling/errors/database/FailedToCreateDatabaseObject.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/handling/errors/database/FailedToUpdateDatabaseObject.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/16042023T1228.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/Address.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/Address.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/Billing.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/Billing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/Client.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/Client.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/Professional.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/Professional.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/User.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/User.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/handling/errors/database/FailedToCreateUser.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/handling/errors/database/FailedToCreateUser.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/User_Controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/User_Controller.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/handling/Result_Handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/handling/Result_Handler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/handling/errors/API_Exception.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/handling/errors/API_Exception.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/handling/errors/database/DatabaseError.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/handling/errors/database/DatabaseError.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/handling/errors/database/FailedToCreateUser.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/handling/errors/database/NoUpdateFieldsProvided.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/packager/Decoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/packager/Decoder.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/packager/Encoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/packager/Encoder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -49,7 +61,7 @@
       <recent name="D:\Data\User Data\Documents\Documentation\Studies\University\CSIT314\Group Project\Repos\be_314\src\py\service" />
     </key>
   </component>
-  <component name="RunManager" selected="Python tests.Python tests for test_database.TestDatabase.test_temp">
+  <component name="RunManager" selected="Python tests.Python tests for test_packager.TestPackager.test_serialize">
     <configuration name="Python tests for test_database.TestDatabase.test_temp" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="py" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -78,10 +90,25 @@
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
+    <configuration name="Python tests for test_packager.TestPackager.test_serialize" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="py" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_packager.TestPackager.test_serialize&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python tests.Python tests for test_database.TestDatabase.test_temp" />
+        <item itemvalue="Python tests.Python tests for test_packager.TestPackager.test_serialize" />
         <item itemvalue="Python tests.Python tests for test_packager.TestPackager.test_deserialize" />
+        <item itemvalue="Python tests.Python tests for test_database.TestDatabase.test_temp" />
       </list>
     </recent_temporary>
   </component>
