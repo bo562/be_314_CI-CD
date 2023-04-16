@@ -46,7 +46,6 @@ class User:
 
         except errors.IntegrityError as ie:  # in case that user already exists
             database.clear()
-            print(ie)
             raise Exception(f'User Already Exists')
 
         # add nested classes
@@ -100,21 +99,22 @@ class User:
         if database.status is DatabaseStatus.Disconnected:
             database.connect()
 
-        # attempt to create base user
-        database.clear()
-        database.update(self, 'user', ('user_id', 'address', 'ccout', 'client', 'professional', 'security_questions'))
-        database.where('user_id = %s', self.user_id)
+        # only if the base fields are not empty run updates on user table
+        if self.check_empty() is False:
+            # attempt to update base user
+            database.update(self, 'user', ('user_id', 'address', 'ccout', 'client', 'professional', 'security_questions'))
+            database.where('user_id = %s', self.user_id)
 
-        # run database query and commit
-        try:
-            database.run()
-            database.commit()
+            # run database query and commit
+            try:
+                database.run()
+                database.commit()
 
-        except errors.IntegrityError as ie:  # in case that user already exists
-            raise ie
+            except errors.IntegrityError as ie:  # in case that change violates consistency constraints
+                raise ie
 
-        except Exception as e:  # other unhandled exceptions
-            raise e
+            except errors.ProgrammingError as e:  # due to no columns being updated
+                raise e
 
         # conditional nesting (may not occur for all user updates)
         if self.ccout is not None:
@@ -173,6 +173,21 @@ class User:
                     break
 
         return passed
+
+    # check if all base fields are null
+    def check_empty(self) -> bool:
+        count = 0
+
+        # add 1 to count if all the fields are none
+        if self.user_id is None: count += 5
+        if self.first_name is None: count += 1
+        if self.last_name is None: count += 1
+        if self.email_address is None: count += 1
+        if self.mobile is None: count += 1
+        if self.password is None: count += 1
+
+        # if count is 5 then object is empty, if count is less than 5 then okay to run queries
+        return True if count >= 5 else False
 
     # return user object (possibly in json form)
     @staticmethod

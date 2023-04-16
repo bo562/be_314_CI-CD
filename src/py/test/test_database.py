@@ -1,5 +1,7 @@
 import unittest
 from mysql.connector import errors
+
+from user.Address import Address
 from util.database.Database import Database
 from util.database.DatabaseStatus import DatabaseStatus
 from util.database.DatabaseLookups import DatabaseLookups
@@ -144,14 +146,14 @@ class TestDatabase(unittest.TestCase):
 
         print(results)
 
-    def test_temp(self):
-        # connect to database
-        database = Database.database_handler(DatabaseLookups.User)
+    def test_empty_object(self):
+        address = Address(street_number=1, street_name="G.O.A.T!!!! Street")
+        user = User(user_id=2, address=address)
 
         # create database query
-        database.clear()
-        database.select(('service_id', 'service_name', 'cost', 'retired'), 'service')
-        database.where('service_name = %s', 'Tree')
+        user.update_user()
+
+        print(user)
 
     def tearDown(self) -> None:
         pass
