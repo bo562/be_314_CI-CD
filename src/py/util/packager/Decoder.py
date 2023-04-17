@@ -4,6 +4,8 @@ py that enables smarter decoding of json objects into specified classes
 
 import orjson
 import json
+
+from service.Request import Request
 from user.User import User
 from user.Address import Address
 from user.Billing import Billing
@@ -27,7 +29,7 @@ class Decoder:
 
     # based on object type call correct FromAPI method
     @staticmethod
-    def default(obj: object):
+    def default(obj: dict):
         if 'user_id' in obj.keys():  # checking for main user object
             return User.FromAPI(obj)
 
@@ -55,5 +57,8 @@ class Decoder:
         elif 'securityQuestion' in obj.keys():
             return User_Question.FromAPI(obj)
 
+        elif 'requestID' in obj.keys():
+            return Request.FromAPI(obj)
+
         else:
-            return obj
+            return None

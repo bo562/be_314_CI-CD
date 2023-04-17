@@ -5,6 +5,8 @@ for manipulation in database
 
 import orjson
 import user
+from service.Request import Request
+from service.Request_Bid import Request_Bid
 from user.Address import Address
 from user.Billing import Billing
 from user.Client import Client
@@ -43,6 +45,12 @@ class Encoder:
 
         elif isinstance(obj, User_Question):
             return User_Question.ToAPI(obj)
+
+        elif isinstance(obj, Request):
+            return Request.ToAPI(obj)
+
+        elif isinstance(obj, Request_Bid):
+            return Request_Bid.ToAPI(obj)
 
         else:
             print(obj)

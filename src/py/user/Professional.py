@@ -193,6 +193,37 @@ class Professional:
         return professional
 
     @staticmethod
+    def get_by_professional_id(professional_id: int):
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # check if database is connected, if not connect
+        if database.status is DatabaseStatus.Disconnected:
+            database.connect()
+
+        # get user object
+        database.clear()
+        database.select(('professional_id', 'subscription_id', 'user_id'), 'professional')
+        database.where('professional_id = %s', professional_id)
+
+        # try to get authorisation
+        professional = None
+        try:
+            results = database.run()
+
+        except Exception as e:
+            raise e
+
+        if len(results) > 0:  # i.e something is returned
+            professional = Professional(professional_id=results[0][0], subscription_id=results[0][1],
+                                        user_id=results[0][2])
+
+            # get services
+            professional.retrieve_services()
+
+        return professional
+
+    @staticmethod
     def ToAPI(obj):
         if isinstance(obj, Professional):
             remap = {

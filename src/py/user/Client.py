@@ -145,6 +145,34 @@ class Client:
         return client
 
     @staticmethod
+    def get_by_client_id(client_id: int):
+        # create database connection
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # check if database is connected, if not connect
+        if database.status is DatabaseStatus.Disconnected:
+            database.connect()
+
+        # get user object
+        database.clear()
+        database.select(('client_id', 'subscription_id', 'user_id'),
+                        'client')
+        database.where('client_id = %s', client_id)
+
+        # try to get authorisation
+        client = None
+        try:
+            results = database.run()
+
+        except Exception as e:
+            raise e
+
+        if len(results) > 0:
+            client = Client(client_id=results[0][0], subscription_id=results[0][1], user_id=results[0][2])
+
+        return client
+
+    @staticmethod
     def ToAPI(obj):
         if isinstance(obj, Client):
             # take subscription_id and get name
