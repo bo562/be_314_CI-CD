@@ -2,16 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a5225606-bd9d-48d2-a05d-2a6ffdebdba2" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/service/Request_Status.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/util/handling/errors/database/NoDatabaseObjectFound.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/service/Bid_Status.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/handling/errors/database/DatabaseConnectionError.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/py.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/py.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/Request.py" beforeDir="false" afterPath="$PROJECT_DIR$/service/Request.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/Request_Bid.py" beforeDir="false" afterPath="$PROJECT_DIR$/service/Request_Bid.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/test_packager.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/test_packager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/Client.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/Client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/Professional.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/Professional.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/packager/Decoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/packager/Decoder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/packager/Encoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/packager/Encoder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,8 +19,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
         <option value="Python Unit Test" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -50,7 +48,21 @@
       <recent name="D:\Data\User Data\Documents\Documentation\Studies\University\CSIT314\Group Project\Repos\be_314\src\py\service" />
     </key>
   </component>
-  <component name="RunManager" selected="Python tests.Python tests for test_packager.TestPackager.test_request_packing">
+  <component name="RunManager" selected="Python tests.Python tests for test_packager.TestPackager.test_request_bid_packing">
+    <configuration name="Python tests for test_packager.TestPackager.test_request_bid_packing" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="py" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_packager.TestPackager.test_request_bid_packing&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
     <configuration name="Python tests for test_packager.TestPackager.test_request_packing" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="py" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -81,6 +93,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python tests.Python tests for test_packager.TestPackager.test_request_bid_packing" />
         <item itemvalue="Python tests.Python tests for test_packager.TestPackager.test_request_packing" />
         <item itemvalue="Python tests.Python tests for test_packager.TestPackager.test_request_unpacking" />
       </list>

@@ -124,17 +124,17 @@ class TestPackager(unittest.TestCase):
 
     def test_request_bid_packing(self):
         request_bid = """ {
-            "requestID": 0,
-            "applicationID": 0,
+            "applicationID": "0",
+            "requestID": "0",
             "offerDate": "string",
-            "userID": 1,
+            "professionalID": "1",
             "cost": 0,
-            "applicationStatus": "string"
+            "applicationStatus": "Active"
         }
         """
 
-        encoded = Encoder(request_bid).serialize()
-        print(encoded)
+        decoded = Decoder(request_bid).deserialize()
+        print(decoded)
 
     if __name__ == '__main__':
         unittest.main(warnings='ignore')

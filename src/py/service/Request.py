@@ -14,6 +14,7 @@ from service.Request_Bid import Request_Bid
 from user.User import User
 from mysql.connector import errors
 
+from util.handling.errors.database.DatabaseConnectionError import DatabaseConnectionError
 from util.handling.errors.database.DatabaseObjectAlreadyExists import DatabaseObjectAlreadyExists
 
 
@@ -38,37 +39,12 @@ class Request:
             database.connect()
 
         elif database.status is DatabaseStatus.NoImplemented:
-            raise errors.InternalError  # change with mysql errors
-            # attempt to create address row
-        database.select(('request_status_id',), 'request_status')
-        database.where('status_name = %s', self.status_name)
-        self.request_status_id = database.run()[0][0]
-        database.clear()
+            raise DatabaseConnectionError(table='request', query=None, database_object=None)
 
-        # attempt to create address row
-        database.insert(self, 'request', ('request_id', 'professional_id', 'completion_date', 'request_status_id', 'status_name',))
-
-        try:
-            address_id = database.run()
-            database.commit()
-        except errors.IntegrityError as ie:  # in case that user already exists
-            # revert changes and remove lock
-            database.rollback()
-
-            # clear tool
-            query = database.review_query()
-            database.clear()
-
-            if ie.errno == 1452:  # cannot solve gracefully
-                raise DatabaseObjectAlreadyExists(status_code=400, table='request', query=query, database_object=self,
-                                                  message=ie.msg)
-
-
-
-        self.address_id = address_id
-
+        
         # clear database tool
         database.clear()
+        database.disconnect()
 
         return self
 

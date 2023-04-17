@@ -6,6 +6,7 @@ import orjson
 import json
 
 from service.Request import Request
+from service.Request_Bid import Request_Bid
 from user.User import User
 from user.Address import Address
 from user.Billing import Billing
@@ -57,8 +58,11 @@ class Decoder:
         elif 'securityQuestion' in obj.keys():
             return User_Question.FromAPI(obj)
 
-        elif 'requestID' in obj.keys():
+        elif 'requestID' in obj.keys() and 'applicationID' not in obj.keys():
             return Request.FromAPI(obj)
+
+        elif 'applicationID' in obj.keys():
+            return Request_Bid.FromAPI(obj)
 
         else:
             return None
