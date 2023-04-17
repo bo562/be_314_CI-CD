@@ -3,6 +3,7 @@ CREATE TABLE request (
      client_id          MEDIUMINT NOT NULL,
      service_id         INT NOT NULL,
      request_date       DATETIME NOT NULL,
+     postcode           INT NOT NULL,
      professional_id    MEDIUMINT,
      start_date         DATETIME,
      completion_date    DATETIME,
