@@ -57,7 +57,7 @@ class User_Controller:
     def update_user(self) -> user.User:
         try:
             json_body = self.__event.get('body-json')
-            usr = Decoder(json.dumps(json_body), user.User).deserialize()
+            usr = Decoder(json.dumps(json_body)).deserialize()
             updated_user = usr.update_user()
 
         except DatabaseObjectAlreadyExists as doae:
