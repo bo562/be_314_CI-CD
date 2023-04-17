@@ -2,7 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a5225606-bd9d-48d2-a05d-2a6ffdebdba2" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/lambda/service_lambda.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/service/Request.py" beforeDir="false" afterPath="$PROJECT_DIR$/service/Request.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/service/Service_Controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/service/Service_Controller.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/test_packager.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/test_packager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/Client.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/Client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/packager/Decoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/packager/Decoder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/packager/Encoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/packager/Encoder.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,7 +48,7 @@
       <recent name="D:\Data\User Data\Documents\Documentation\Studies\University\CSIT314\Group Project\Repos\be_314\src\py\service" />
     </key>
   </component>
-  <component name="RunManager" selected="Python tests.Python tests for test_packager.TestPackager.test_request_bid_packing">
+  <component name="RunManager" selected="Python tests.Python tests for test_packager.TestPackager.test_request_packing">
     <configuration name="Python tests for test_packager.TestPackager.test_request_bid_packing" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="py" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -86,9 +93,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python tests.Python tests for test_packager.TestPackager.test_request_bid_packing" />
         <item itemvalue="Python tests.Python tests for test_packager.TestPackager.test_request_packing" />
         <item itemvalue="Python tests.Python tests for test_packager.TestPackager.test_request_unpacking" />
+        <item itemvalue="Python tests.Python tests for test_packager.TestPackager.test_request_bid_packing" />
       </list>
     </recent_temporary>
   </component>

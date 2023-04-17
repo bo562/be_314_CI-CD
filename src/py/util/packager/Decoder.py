@@ -45,7 +45,7 @@ class Decoder:
         elif 'streetName' in obj.keys() or \
                 'streetNumber' in obj.keys() or \
                 'suburb' in obj.keys() or \
-                'postcode' in obj.keys():
+                'postcode' in obj.keys() and 'requestID' not in obj.keys():
             return Address.FromAPI(obj)
 
         elif 'membershipType' in obj.keys():  # checking for client field

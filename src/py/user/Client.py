@@ -160,13 +160,13 @@ class Client:
         database.where('client_id = %s', client_id)
 
         # try to get authorisation
-        client = None
         try:
             results = database.run()
 
         except Exception as e:
             raise e
 
+        client = None
         if len(results) > 0:
             client = Client(client_id=results[0][0], subscription_id=results[0][1], user_id=results[0][2])
 
