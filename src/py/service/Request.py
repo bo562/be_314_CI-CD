@@ -16,6 +16,8 @@ from mysql.connector import errors
 
 from util.handling.errors.database.DatabaseConnectionError import DatabaseConnectionError
 from util.handling.errors.database.DatabaseObjectAlreadyExists import DatabaseObjectAlreadyExists
+from util.handling.errors.database.FailedToCreateDatabaseObject import FailedToCreateDatabaseObject
+from util.handling.errors.database.FailedToUpdateDatabaseObject import FailedToUpdateDatabaseObject
 
 
 @dataclass
@@ -41,7 +43,29 @@ class Request:
         elif database.status is DatabaseStatus.NoImplemented:
             raise DatabaseConnectionError(table='request', query=None, database_object=None)
 
-        
+        # construct query for creation
+        database.insert(self, 'request', ('request_id', 'start_date', 'completion_date', 'request_bids'))
+
+        # try to run query
+        try:
+            self.request_id = database.run()
+            database.commit()
+
+        except errors.IntegrityError as ie:  # in case that change violates consistency constraints
+            # clean up instance and rollback to remove lock
+            database.rollback()
+            query = database.review_query()
+            database.clear()
+            database.disconnect()
+
+            # if there is an integrity error
+            if ie.errno == 1452:  # cannot solve gracefully
+                # raise error
+                raise DatabaseObjectAlreadyExists(table='user', query=query, database_object=self)
+
+            # some other consistency constraint check
+            raise FailedToCreateDatabaseObject(table='user', query=query, database_object=self)
+
         # clear database tool
         database.clear()
         database.disconnect()
@@ -56,30 +80,34 @@ class Request:
             database.connect()
 
         elif database.status is DatabaseStatus.NoImplemented:
-            raise errors.InternalError  # change with mysql errors
-        if self.status_name is not None:
-            try:
-                database.select(('request_status_id',), 'request_status')
-                database.where('status_name = %s', self.status_name)
-                self.request_status_id = database.run()[0][0]
-                database.clear()
-            except errors.IntegrityError as ie:  # in case that user already exists
-                if ie.errno == 1452:  # cannot solve gracefully
-                    raise ie
-        # create query
-        database.clear()
-        database.update(self, 'request', ('request_id', 'status_name'))
-        database.where('request_id = %s', self.request_id)
+            raise DatabaseConnectionError(table='request', query=None, database_object=None)
 
-        try:  # attempt to return
-            database.run()
+        # construct query for creation
+        database.insert(self, 'request', ('request_id', 'start_date', 'completion_date', 'request_bids'))
+
+        # try to run query
+        try:
+            self.request_id = database.run()
             database.commit()
 
-        except errors.IntegrityError as ie:
-            raise ie
+        except errors.IntegrityError as ie:  # in case that change violates consistency constraints
+            # clean up instance and rollback to remove lock
+            database.rollback()
+            query = database.review_query()
+            database.clear()
+            database.disconnect()
+
+            # if there is an integrity error
+            if ie.errno == 1452:  # cannot solve gracefully
+                # raise error
+                raise DatabaseObjectAlreadyExists(table='user', query=query, database_object=self)
+
+            # some other consistency constraint check
+            raise FailedToUpdateDatabaseObject(table='user', query=query, database_object=self)
 
         # clear database tool
         database.clear()
+        database.disconnect()
 
         return self
 
