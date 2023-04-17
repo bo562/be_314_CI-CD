@@ -3,6 +3,7 @@ CREATE TABLE request_bid (
      request_id                   MEDIUMINT NOT NULL,
      professional_id              MEDIUMINT NOT NULL,
      sent_date                    DATETIME NOT NULL,
+     amount                       DECIMAL(10,2) NOT NULL,
      accepted_by_client_date      DATETIME,
      professional_cancelled_date  DATETIME,     
      bid_status_id                INT NOT NULL,
