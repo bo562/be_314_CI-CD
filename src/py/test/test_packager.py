@@ -1,5 +1,6 @@
 import orjson
 
+from service.Request import Request
 from user.User import User
 from user.Address import Address
 from user.Billing import Billing
@@ -98,6 +99,42 @@ class TestPackager(unittest.TestCase):
         decoder = Decoder(user_input, User)
         result = decoder.deserialize()
         print(result)
+
+    def test_request_unpacking(self):
+        request = """{
+            "requestID": 0,
+            "requestDate": "10/12/2023",
+            "serviceType": "Plumbing",
+            "requestStatus": "New",
+            "jobDescription": "My Toilet is broken",
+            "clientID": "10",
+            "professionalID": "1"
+        }"""
+
+        decoded = Decoder(request).deserialize()
+        print(decoded)
+
+    def test_request_packing(self):
+        request = Request(request_id=None, request_date='10/12/2023', start_date=None, completion_date=None,
+                          instruction='My Toilet is broken', client_id=7, professional_id=3, service_id=4,
+                          request_status_id=1)
+
+        encoded = Encoder(request).serialize()
+        print(encoded)
+
+    def test_request_bid_packing(self):
+        request_bid = """ {
+            "applicationID": "0",
+            "requestID": "0",
+            "offerDate": "string",
+            "professionalID": "1",
+            "cost": 0,
+            "applicationStatus": "Active"
+        }
+        """
+
+        decoded = Decoder(request_bid).deserialize()
+        print(decoded)
 
     if __name__ == '__main__':
         unittest.main(warnings='ignore')

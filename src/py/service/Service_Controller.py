@@ -4,7 +4,7 @@ py that describes the controller for the service sub-package. Enabling...
 
 
 class Service_Controller:
-    def __init__(self):
+    def __init__(self, event: dict):
         pass
 
     def create_request(self):

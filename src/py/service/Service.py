@@ -20,12 +20,11 @@ class Service:
         pass
 
     @staticmethod
-    def get_by_service_id(service_id: int):
+    def get_by_service_id(service_id: int) -> 'Service':
         # connect to database
         database = Database.database_handler(DatabaseLookups.User)
 
         # create database query
-        database.clear()
         database.select(('service_id', 'service_name', 'retired'), 'service')
         database.where('service_id = %s', service_id)
 
@@ -33,8 +32,16 @@ class Service:
         try:
             results = database.run()
         except Exception as e:
+            # clean up and disconnect
+            database.clear()
+            database.disconnect()
             raise e
 
+        # clear and disconnect from database
+        database.clear()
+        database.disconnect()
+
+        # return service object from result (some what dangerous if indexing becomes incorrect)
         return Service(service_id=results[0][0], service_name=results[0][1], retired=results[0][2])
 
     @staticmethod
