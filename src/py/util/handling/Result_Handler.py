@@ -15,3 +15,8 @@ class Result_Handler:
         to_return.update(json.loads(Encoder(result).serialize().decode('utf-8')))  # .decode converts from bytes to string
 
         return to_return
+
+    # when trying to fix parsing error use this method
+    @staticmethod
+    def no_status_code(result: object):
+        return json.loads(Encoder(result).serialize().decode('utf-8'))

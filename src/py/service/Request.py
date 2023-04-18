@@ -28,6 +28,7 @@ class Request:
     start_date: datetime = None
     completion_date: datetime = None
     instruction: str = None
+    postcode: int = None
     client_id: int = None
     professional_id: int = None
     service_id: int = None
@@ -71,7 +72,7 @@ class Request:
         database.clear()
         database.disconnect()
 
-        return self
+        return Request.get_request(self.request_id)
 
     def update_request(self):
         database = Database.database_handler(DatabaseLookups.User)  # create database connection
@@ -125,7 +126,7 @@ class Request:
             raise DatabaseConnectionError(table='request', query=None, database_object=None)
 
         # create query for database connection
-        database.select(('request_id', 'request_date', 'instruction', 'client_id', 'professional_id', 'service_id',
+        database.select(('request_id', 'request_date', 'instruction', 'postcode', 'client_id', 'professional_id', 'service_id',
                          'request_status_id'), 'request')
         database.where('request_id = %s', request_id)
 
@@ -141,15 +142,111 @@ class Request:
 
         # parse into request object
         request = Request(request_id=result[0][0], request_date=result[0][1], instruction=result[0][2],
-                          client_id=result[0][3], professional_id=[0][4], service_id=result[0][5],
-                          request_status_id=result[0][6])
+                          postcode=result[0][3], client_id=result[0][4], professional_id=result[0][5],
+                          service_id=result[0][6], request_status_id=result[0][7])
+
+        # get request_bids
+        request.request_bids = Request_Bid.get_by_request_id(request.request_id)
+
+        # clean up instance
+        database.clear()
+        database.disconnect()
 
         return request
 
     # returns an array
     @staticmethod
     def get_client_requests(client_id: int):
-        pass
+        # create database session
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # check if session is connected
+        if database.status is not DatabaseStatus.Connected:
+            database.connect()
+
+        elif database.status is DatabaseStatus.NoImplemented:
+            raise DatabaseConnectionError(table='request', query=None, database_object=None)
+
+        # create query for database connection
+        database.select(('request_id',), 'request')
+        database.where('client_id = %s', client_id)
+
+        # try to run query
+        results = database.run()
+
+        # if nothing is found return error
+        if len(results) == 0:
+            query = database.review_query()
+            database.clear()
+            database.disconnect()
+            raise NoDatabaseObjectFound(table='request', query=query, database_object=None)
+
+        # parse into request object
+        requests = []
+        for result in results:
+            requests.append(Request.get_request(result[0]))
+
+        return requests
+
+    @staticmethod
+    def get_client_requests(professional_id: int):
+        # create database session
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # check if session is connected
+        if database.status is not DatabaseStatus.Connected:
+            database.connect()
+
+        elif database.status is DatabaseStatus.NoImplemented:
+            raise DatabaseConnectionError(table='request', query=None, database_object=None)
+
+        # create query for database connection
+        database.select(('request_id',), 'request')
+        database.where('professional_id = %s', professional_id)
+
+        # try to run query
+        results = database.run()
+
+        # if nothing is found return error
+        if len(results) == 0:
+            return None
+
+        # parse into request object
+        requests = []
+        for result in results:
+            requests.append(Request.get_request(result[0]))
+
+        return requests
+
+    @staticmethod
+    def get_by_postcode(postcode: int) -> ['Request']:
+        # create database session
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # check if session is connected
+        if database.status is not DatabaseStatus.Connected:
+            database.connect()
+
+        elif database.status is DatabaseStatus.NoImplemented:
+            raise DatabaseConnectionError(table='request', query=None, database_object=None)
+
+        # create query for database connection
+        database.select(('request_id',), 'request')
+        database.where('postcode = %s', postcode)
+
+        # try to run query
+        results = database.run()
+
+        # if nothing is found return error
+        if len(results) == 0:
+            return None
+
+        # parse into request object
+        requests = []
+        for result in results:
+            requests.append(Request.get_request(result[0]))
+
+        return requests
 
     @staticmethod
     def ToAPI(obj):
@@ -170,6 +267,7 @@ class Request:
                 "serviceType": service_name,
                 "requestStatus": status_name,
                 "jobDescription": obj.instruction,
+                "postcode": obj.postcode,
                 "clientID": client_id,
                 "professionalID": professional_id,
                 "applications": obj.request_bids if obj.request_bids is not None else None
@@ -194,5 +292,6 @@ class Request:
 
         # return request object
         return Request(request_id=None, request_date=obj.get('requestDate'), instruction=obj.get('jobDescription'),
-                       service_id=service_id, client_id=client_id, professional_id=professional_id,
-                       request_status_id=request_status_id, request_bids=obj.get('applications'))
+                       service_id=service_id, client_id=client_id, postcode=obj.get('postcode'),
+                       professional_id=professional_id, request_status_id=request_status_id,
+                       request_bids=obj.get('applications'))
