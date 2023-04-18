@@ -52,7 +52,4 @@ class Encoder:
         elif isinstance(obj, Request_Bid):
             return Request_Bid.ToAPI(obj)
 
-        else:
-            print(obj)
-
         raise TypeError

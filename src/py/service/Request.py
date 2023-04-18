@@ -117,15 +117,25 @@ class Request:
     @staticmethod
     def ToAPI(obj):
         if isinstance(obj, Request):
+            if obj.professional_id is not None:
+                professional_id = Professional.get_by_professional_id(obj.professional_id).user_id
+            else:
+                professional_id = None
+
+            # revert ids into names for api results
+            service_name = Service.get_by_service_id(obj.service_id).service_name
+            status_name = Request_Status.get_request_status_by_id(obj.request_status_id).status_name
+            client_id = Client.get_by_client_id(obj.client_id).client_id
+
             remap = {
                 "requestID": obj.request_id,
                 "requestDate": obj.request_date,
-                "serviceType": Service.get_by_service_id(obj.service_id).service_name,
-                "requestStatus": Request_Status.get_request_status_by_id(obj.request_status_id).status_name,
+                "serviceType": service_name,
+                "requestStatus": status_name,
                 "jobDescription": obj.instruction,
-                "clientID": Client.get_by_client_id(obj.client_id).user_id,
-                "professionalID": Professional.get_by_professional_id(obj.professional_id).user_id,
-                "applications": obj.request_bids
+                "clientID": client_id,
+                "professionalID": professional_id,
+                "applications": obj.request_bids if obj.request_bids is not None else None
             }
 
             return remap
