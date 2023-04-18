@@ -25,6 +25,8 @@ class Request_Bid:
     def update_offer(self):
         pass
 
+        
+
     @staticmethod
     def ToAPI(obj):
         if isinstance(obj, Request_Bid):

@@ -18,6 +18,7 @@ from util.handling.errors.database.DatabaseConnectionError import DatabaseConnec
 from util.handling.errors.database.DatabaseObjectAlreadyExists import DatabaseObjectAlreadyExists
 from util.handling.errors.database.FailedToCreateDatabaseObject import FailedToCreateDatabaseObject
 from util.handling.errors.database.FailedToUpdateDatabaseObject import FailedToUpdateDatabaseObject
+from util.handling.errors.database.NoDatabaseObjectFound import NoDatabaseObjectFound
 
 
 @dataclass
@@ -111,7 +112,43 @@ class Request:
 
         return self
 
-    def get_request(self):
+    @staticmethod
+    def get_request(request_id: int) -> 'Request':
+        # create database session
+        database = Database.database_handler(DatabaseLookups.User)
+
+        # check if session is connected
+        if database.status is not DatabaseStatus.Connected:
+            database.connect()
+
+        elif database.status is DatabaseStatus.NoImplemented:
+            raise DatabaseConnectionError(table='request', query=None, database_object=None)
+
+        # create query for database connection
+        database.select(('request_id', 'request_date', 'instruction', 'client_id', 'professional_id', 'service_id',
+                         'request_status_id'), 'request')
+        database.where('request_id = %s', request_id)
+
+        # try to run query
+        result = database.run()
+
+        # if nothing is found return error
+        if len(result) == 0:
+            query = database.review_query()
+            database.clear()
+            database.disconnect()
+            raise NoDatabaseObjectFound(table='request', query=query, database_object=None)
+
+        # parse into request object
+        request = Request(request_id=result[0][0], request_date=result[0][1], instruction=result[0][2],
+                          client_id=result[0][3], professional_id=[0][4], service_id=result[0][5],
+                          request_status_id=result[0][6])
+
+        return request
+
+    # returns an array
+    @staticmethod
+    def get_client_requests(client_id: int):
         pass
 
     @staticmethod

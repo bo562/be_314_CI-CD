@@ -31,7 +31,12 @@ class Service_Controller:
         if self.__context.get('resource-path') == '/serviceRequest':
             # handle different methods triggered at endpoint
             if self.__context.get('http-method') == 'GET':
-                return self.client_get_request()
+                # differs based on whether intended for client or professional
+                if self.__context.get('user_type') == 'Client':
+                    return self.client_get_request()
+
+                elif self.__context.get('user_type') == 'Professional':
+                    return self.professional_get_request()
 
             elif self.__context.get('http-method') == 'POST':
                 return self.client_create_request()
@@ -83,6 +88,7 @@ class Service_Controller:
         except FailedToCreateDatabaseObject as fcdo:
             return fcdo.generate_api_error()
 
+        # parse and return
         return Result_Handler.Prepare_For_API('200', new_service_request)
 
     def client_get_request(self):
