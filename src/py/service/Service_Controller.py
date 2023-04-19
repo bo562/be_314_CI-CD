@@ -78,7 +78,7 @@ class Service_Controller:
 
         # attempt to update provided request
         try:
-            new_service_request = service_request.update_request()
+            updated_service_request = service_request.update_request()
 
         # catch possible errors
         except DatabaseConnectionError as dce:
@@ -91,7 +91,7 @@ class Service_Controller:
             return fcdo.generate_api_error()
 
         # parse and return
-        return Result_Handler.Prepare_For_API('200', new_service_request)
+        return Result_Handler.no_status_code(updated_service_request)
 
     def client_get_request(self):
         usr = User.get_user(self.__context.get('user_id'))

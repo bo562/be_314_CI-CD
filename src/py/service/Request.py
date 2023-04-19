@@ -75,7 +75,7 @@ class Request:
 
         return Request.get_request(self.request_id)
 
-    def update_request(self):
+    def update_request(self) -> 'Request':
         database = Database.database_handler(DatabaseLookups.User)  # create database connection
 
         # check if database is connected, if not connect
@@ -88,6 +88,7 @@ class Request:
 
         # construct query for creation
         database.update(self, 'request', ('request_id', 'start_date', 'completion_date', 'request_bids'))
+        database.where('request_id = %s', self.request_id)
 
         # try to run query
         try:
@@ -113,7 +114,7 @@ class Request:
         database.clear()
         database.disconnect()
 
-        return self
+        return Request.get_request(self.request_id)
 
     @staticmethod
     def get_request(request_id: int) -> 'Request':
@@ -137,7 +138,7 @@ class Request:
 
         # if nothing is found return error
         if len(result) == 0:
-            return Request()  # return empty object
+            return None  # return empty object
 
         # parse into request object
         request = Request(request_id=result[0][0], request_date=result[0][1], instruction=result[0][2],
@@ -255,7 +256,7 @@ class Request:
             # revert ids into names for api results
             service_name = Service.get_by_service_id(obj.service_id).service_name
             status_name = Request_Status.get_request_status_by_id(obj.request_status_id).status_name
-            client_id = Client.get_by_client_id(obj.client_id).client_id
+            client_id = Client.get_by_client_id(obj.client_id).user_id if obj.client_id is not None else None
 
             remap = {
                 "requestID": obj.request_id,
@@ -275,22 +276,19 @@ class Request:
 
     @staticmethod
     def FromAPI(obj):
-        # get required ids
-        client_id = User.get_user(obj.get('clientID')).client.client_id
-        request_status_id = Request_Status.get_request_status_by_name(obj.get('requestStatus')).request_status_id
-        service_id = Service.get_by_service_name(obj.get('serviceType')).service_id
+        # get request status ids
+        request_status_id = Request_Status.get_request_status_by_name(obj.get('requestStatus')).request_status_id if obj.get('requestStatus') is not None else None
+        service_id = Service.get_by_service_name(obj.get('serviceType')).service_id if obj.get('serviceType') is not None else None
 
-        # check if professional_id exists and retrieve
-        if obj.get('professionalID') is not None:
-            professional_id = Professional.get_professional(obj.get('professionalID')).professional_id
-        else:
-            professional_id = None
+        # check if professional_id and client_id exists
+        professional_id = Professional.get_professional(obj.get('professionalID')).professional_id if obj.get('professionalID') is not None else None
+        client_id = User.get_user(obj.get('clientID')).client.client_id if obj.get('clientID') is not None else None
 
         # parse date time
-        requestDate = datetime.strptime(obj.get('requestDate'), '%m/%d/%Y')
+        request_date = datetime.strptime(obj.get('requestDate'), '%m/%d/%Y') if obj.get('requestDate') is not None else None
 
         # return request object
-        return Request(request_id=None, request_date=requestDate, instruction=obj.get('jobDescription'),
+        return Request(request_id=obj.get('requestID'), request_date=request_date, instruction=obj.get('jobDescription'),
                        service_id=service_id, client_id=client_id, postcode=obj.get('postcode'),
                        professional_id=professional_id, request_status_id=request_status_id,
                        request_bids=obj.get('applications'))

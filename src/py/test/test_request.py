@@ -14,7 +14,12 @@ class MyTestCase(unittest.TestCase):
         print(request.create_request())
 
     def test_get_request(self):
-        print(Request.get_request(41))
+        print(Request.get_request(6))
+
+    def test_update_request(self):
+        request = Request(request_id=6, instruction="Testing this change")
+        updated_request = request.update_request()
+        print(updated_request)
 
     def test_get_by_client_id(self):
         requests = Request.get_client_requests(1)
