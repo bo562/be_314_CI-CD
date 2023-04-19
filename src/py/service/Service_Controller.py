@@ -3,6 +3,8 @@ py that describes the controller for the service sub-package. Enabling...
 """
 import json
 
+from user.User import User
+from service.Request import Request
 from util.handling.Result_Handler import Result_Handler
 from util.handling.errors.database.DatabaseConnectionError import DatabaseConnectionError
 from util.handling.errors.database.DatabaseObjectAlreadyExists import DatabaseObjectAlreadyExists
@@ -31,7 +33,12 @@ class Service_Controller:
         if self.__context.get('resource-path') == '/serviceRequest':
             # handle different methods triggered at endpoint
             if self.__context.get('http-method') == 'GET':
-                return self.client_get_request()
+                # differs based on whether intended for client or professional
+                if self.__context.get('user_type') == 'Client':
+                    return self.client_get_request()
+
+                elif self.__context.get('user_type') == 'Professional':
+                    return self.professional_get_request()
 
             elif self.__context.get('http-method') == 'POST':
                 return self.client_create_request()
@@ -83,13 +90,25 @@ class Service_Controller:
         except FailedToCreateDatabaseObject as fcdo:
             return fcdo.generate_api_error()
 
+        # parse and return
         return Result_Handler.Prepare_For_API('200', new_service_request)
 
     def client_get_request(self):
-        pass
+        usr = User.get_user(self.__context.get('user_id'))
+
+        requests = Request.get_client_requests(usr.client.client_id)
+
+        return Result_Handler.no_status_code(requests)
 
     def professional_get_request(self):
-        pass
+        usr = User.get_user(self.__context.get('user_id'))
+
+        requests = Request.get_client_requests(usr.client.client_id)
+
+        return Result_Handler.no_status_code(requests)
 
     def professional_get_available_request(self):
-        pass
+        return self.__context.get('postcode')
+        requests = Request.get_by_postcode(self.__context.get('postcode'))
+
+        return Result_Handler.no_status_code(requests)
