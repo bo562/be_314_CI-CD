@@ -40,6 +40,9 @@ class User_Controller:
         elif self.__context.get('resource-path') == '/user/validate':
             return self.validate_user()
 
+        elif self.__context.get('resource-path') == '/user/userGet':
+            return self.get_user()
+
     def create_user(self) -> object:
         try:
             json_body = self.__event.get('body-json')
@@ -70,3 +73,7 @@ class User_Controller:
 
     def validate_user(self) -> dict:
         return user.User.User.validate_email(self.__context.get('email_address'))
+
+    def get_user(self) -> dict:
+        usr = user.User.User.get_user(self.__context.get('user_id'))
+        return Result_Handler.Prepare_For_API('200', usr)
