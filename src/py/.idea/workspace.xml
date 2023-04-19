@@ -8,6 +8,7 @@
       <change beforePath="$PROJECT_DIR$/service/Service_Controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/service/Service_Controller.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/test_request.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/test_request.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/handling/Result_Handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/util/handling/Result_Handler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/User_Controller.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/User_Controller.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
