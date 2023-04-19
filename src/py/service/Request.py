@@ -2,6 +2,7 @@
 py that handles data for requests type
 """
 from datetime import datetime
+from datetime import date
 from dataclasses import dataclass
 from service.Service import Service
 from user.Client import Client
@@ -24,7 +25,7 @@ from util.handling.errors.database.NoDatabaseObjectFound import NoDatabaseObject
 @dataclass
 class Request:
     request_id: int = None
-    request_date: datetime = None
+    request_date: date = None
     start_date: datetime = None
     completion_date: datetime = None
     instruction: str = None
@@ -82,14 +83,15 @@ class Request:
             database.connect()
 
         elif database.status is DatabaseStatus.NoImplemented:
+            database.disconnect()
             raise DatabaseConnectionError(table='request', query=None, database_object=None)
 
         # construct query for creation
-        database.insert(self, 'request', ('request_id', 'start_date', 'completion_date', 'request_bids'))
+        database.update(self, 'request', ('request_id', 'start_date', 'completion_date', 'request_bids'))
 
         # try to run query
         try:
-            self.request_id = database.run()
+            database.run()
             database.commit()
 
         except errors.IntegrityError as ie:  # in case that change violates consistency constraints
@@ -135,10 +137,7 @@ class Request:
 
         # if nothing is found return error
         if len(result) == 0:
-            query = database.review_query()
-            database.clear()
-            database.disconnect()
-            raise NoDatabaseObjectFound(table='request', query=query, database_object=None)
+            return Request()  # return empty object
 
         # parse into request object
         request = Request(request_id=result[0][0], request_date=result[0][1], instruction=result[0][2],
@@ -176,10 +175,7 @@ class Request:
 
         # if nothing is found return error
         if len(results) == 0:
-            query = database.review_query()
-            database.clear()
-            database.disconnect()
-            raise NoDatabaseObjectFound(table='request', query=query, database_object=None)
+            return Request()  # return empty object
 
         # parse into request object
         requests = []
@@ -263,7 +259,7 @@ class Request:
 
             remap = {
                 "requestID": obj.request_id,
-                "requestDate": obj.request_date,
+                "requestDate": obj.request_date.strftime('%m/%d/%Y') if obj.request_date is not None else None,
                 "serviceType": service_name,
                 "requestStatus": status_name,
                 "jobDescription": obj.instruction,
@@ -290,8 +286,11 @@ class Request:
         else:
             professional_id = None
 
+        # parse date time
+        requestDate = datetime.strptime(obj.get('requestDate'), '%m/%d/%Y')
+
         # return request object
-        return Request(request_id=None, request_date=obj.get('requestDate'), instruction=obj.get('jobDescription'),
+        return Request(request_id=None, request_date=requestDate, instruction=obj.get('jobDescription'),
                        service_id=service_id, client_id=client_id, postcode=obj.get('postcode'),
                        professional_id=professional_id, request_status_id=request_status_id,
                        request_bids=obj.get('applications'))
