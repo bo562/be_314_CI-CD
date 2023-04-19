@@ -115,10 +115,7 @@ class TestPackager(unittest.TestCase):
         print(decoded)
 
     def test_request_packing(self):
-        request = Request(request_id=None, request_date='10/12/2023', start_date=None, completion_date=None,
-                          instruction='My Toilet is broken', client_id=7, service_id=4,
-                          request_status_id=1)
-
+        request = Request.get_request(6)
         encoded = Encoder(request).serialize()
         print(encoded)
 
