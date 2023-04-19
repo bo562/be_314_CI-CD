@@ -78,7 +78,7 @@ class Service_Controller:
 
         # attempt to update provided request
         try:
-            new_service_request = service_request.create_request()
+            new_service_request = service_request.update_request()
 
         # catch possible errors
         except DatabaseConnectionError as dce:
