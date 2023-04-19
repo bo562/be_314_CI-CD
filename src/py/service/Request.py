@@ -126,8 +126,8 @@ class Request:
             raise DatabaseConnectionError(table='request', query=None, database_object=None)
 
         # create query for database connection
-        database.select(('request_id', 'request_date', 'instruction', 'postcode', 'client_id', 'professional_id', 'service_id',
-                         'request_status_id'), 'request')
+        database.select(('request_id', 'request_date', 'instruction', 'postcode', 'client_id', 'professional_id',
+                         'service_id', 'request_status_id'), 'request')
         database.where('request_id = %s', request_id)
 
         # try to run query
@@ -156,7 +156,7 @@ class Request:
 
     # returns an array
     @staticmethod
-    def get_client_requests(client_id: int):
+    def get_client_requests(client_id: int) -> ['Request']:
         # create database session
         database = Database.database_handler(DatabaseLookups.User)
 
@@ -189,7 +189,7 @@ class Request:
         return requests
 
     @staticmethod
-    def get_client_requests(professional_id: int):
+    def get_professional_requests(professional_id: int):
         # create database session
         database = Database.database_handler(DatabaseLookups.User)
 

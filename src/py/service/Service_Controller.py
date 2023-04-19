@@ -103,12 +103,11 @@ class Service_Controller:
     def professional_get_request(self):
         usr = User.get_user(self.__context.get('user_id'))
 
-        requests = Request.get_client_requests(usr.client.client_id)
+        requests = Request.get_professional_requests(usr.professional.professional_id)
 
         return Result_Handler.no_status_code(requests)
 
     def professional_get_available_request(self):
-        return self.__context.get('postcode')
         requests = Request.get_by_postcode(self.__context.get('postcode'))
 
         return Result_Handler.no_status_code(requests)
