@@ -1,0 +1,19 @@
+version: 0.1
+phases:
+  install:
+    rutime-versions:
+      python: 3.9
+  build:
+    commands:
+      - echo "Packaging src files..."
+      - python package.py
+  post_build:
+    commands:
+      - echo "Updating Lambda functions with new src..."
+      - echo "Updating csit314-staging-userController..."
+      - aws lambda update-function-code --function-name csit314-staging-userController --zip-file fileb://src_build.zip
+      - echo "Updating csit314-staging-serviceController..."      
+      - aws lambda update-function-code --function-name csit314-staging-serviceController --zip-file fileb://src_build.zip
+      - echo "Updating csit314-staging-securityController..."      
+      - aws lambda update-function-code --function-name csit314-staging-securityController --zip-file fileb://src_build.zip            
+        
